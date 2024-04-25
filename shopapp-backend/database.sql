@@ -4,7 +4,7 @@ USE shopapp;
 CREATE TABLE users(
     id INT PRIMARY KEY AUTO_INCREMENT,
     fullname VARCHAR(100) DEFAULT '',
-    phonr_number VARCHAR(10) NOT NULL,
+    phone_number VARCHAR(10) NOT NULL,
     address VARCHAR(200) DEFAULT '',
     password VARCHAR(100) NOT NULL DEFAULT '',
     created_at DATETIME,
@@ -67,6 +67,17 @@ CREATE TABLE products(
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
+ALTER TABLE products AUTO_INCREMENT = 1;
+
+CREATE TABLE product_images (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    CONSTRAINT fk_product_images_product_id
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    image_url VARCHAR(300)
+);
+
 --Order--
 CREATE TABLE orders(
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -87,6 +98,7 @@ ALTER TABLE orders ADD COLUMN `shipping_address` VARCHAR(200);
 ALTER TABLE orders ADD COLUMN `shipping_date` DATE;
 ALTER TABLE orders ADD COLUMN `shipping_number` VARCHAR(100);
 ALTER TABLE orders ADD COLUMN `payment_method` VARCHAR(100);
+ALTER TABLE orders ADD COLUMN `payment_date` DATE;
 
 --Xóa 1 đơn hàng => xóa mềm
 ALTER TABLE orders ADD COLUMN active TINYINT(1);
