@@ -60,8 +60,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}") //http://localhost:6969/api/v1/product?page=3&limit=10
-    public ResponseEntity<?> getProductId(@PathVariable("id") Long productId){
-        return ResponseEntity.ok("Product with id: "+ productId);
+    public ResponseEntity<?> getProductId(@PathVariable("id") Long productId) {
+        try {
+            Product existingProduct = productService.getProductById(productId);
+            return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
     @PostMapping("")
@@ -159,14 +165,27 @@ public class ProductController {
         return contentType != null && contentType.startsWith("image/");
     }
 
-    @PutMapping("/{id}") //http://localhost:6969/api/v1/product/{}
-    public ResponseEntity<?> updateproduct(@PathVariable Long id){
-        return ResponseEntity.ok("Updated product with id = " + id);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateproduct(
+            @PathVariable Long id,
+            @RequestBody ProductDTO productDTO){
+        try {
+            Product updateProduct = productService.updateProduct(id, productDTO);
+            return ResponseEntity.ok(updateProduct);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-    @DeleteMapping("/{id}") //http://localhost:6969/api/v1/product/{}
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteproduct(@PathVariable Long id){
-        return ResponseEntity.ok("Deleted product with id = " + id);
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok(String.format("Product with: %d deleted successfully", id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
 //    @PostMapping("/generateFakeProduct")

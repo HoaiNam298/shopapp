@@ -1,7 +1,11 @@
 package com.project.shopapp.controller;
 
 import com.project.shopapp.dtos.OrderDetailDTO;
+import com.project.shopapp.model.OrderDetail;
+import com.project.shopapp.response.OrderDetailResponse;
+import com.project.shopapp.services.OrderDetailService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -11,11 +15,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${api.prefix}/order_details")
+@RequiredArgsConstructor
 public class OrderDetailsController {
+
+    private final OrderDetailService orderDetailService;
 
     @PostMapping("")
     public ResponseEntity<?> createOrderDetail(
-            @Valid @RequestBody OrderDetailDTO orderDetailsDTO,
+            @Valid @RequestBody OrderDetailDTO orderDetailDTO,
             BindingResult result
     ) {
         try {
@@ -26,7 +33,8 @@ public class OrderDetailsController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessage);
             }
-            return ResponseEntity.ok("Create Order detail successfully");
+            OrderDetail newOrderDetail = orderDetailService.createOrderDetail(orderDetailDTO);
+            return ResponseEntity.ok(OrderDetailResponse.fromeOrderDetail(newOrderDetail));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -36,7 +44,13 @@ public class OrderDetailsController {
     public ResponseEntity<?> getOrderDetail(
             @Valid @PathVariable Long id
     ) {
-        return ResponseEntity.ok("Get list order with id = " + id);
+        try {
+            OrderDetail orderDetail = orderDetailService.getOrderDetail(id);
+            return ResponseEntity.ok(OrderDetailResponse.fromeOrderDetail(orderDetail));
+//            return orderDetail;
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     //Lấy danh sách order-detail của 1 order
@@ -44,14 +58,24 @@ public class OrderDetailsController {
     public ResponseEntity<?> getOrderDetails(
             @Valid @PathVariable("order_id") Long orderId
     ) {
-        return ResponseEntity.ok("Get list order with order_id = " + orderId);
+        try {
+            List<OrderDetail> orderDetails = orderDetailService.findByOrderId(orderId);
+            List<OrderDetailResponse> orderDetailResponses = orderDetails
+                    .stream()
+                    .map(OrderDetailResponse::fromeOrderDetail)
+                    .toList();
+            return ResponseEntity.ok(orderDetailResponses);
+//            return ResponseEntity.ok(orderDetails);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
     // Admin
     public ResponseEntity<?> updateOrders(
             @Valid @PathVariable Long id,
-            @Valid @RequestBody OrderDetailDTO newOrderDetailDTO,
+            @Valid @RequestBody OrderDetailDTO orderDetailDTO,
             BindingResult result
     ){
         try {
@@ -62,8 +86,8 @@ public class OrderDetailsController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessage);
             }
-            return ResponseEntity.ok("Update order detail successfully with id = " + id
-                + ", new Order detail data: " + newOrderDetailDTO);
+            OrderDetail orderDetail = orderDetailService.updateOrderDetail(id, orderDetailDTO);
+            return ResponseEntity.ok(orderDetail);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -75,6 +99,11 @@ public class OrderDetailsController {
             @Valid @PathVariable Long id
     ) {
         // Xóa mềm update active = false
-        return ResponseEntity.noContent().build();
+        try {
+            orderDetailService.deleteById(id);
+            return ResponseEntity.ok("Delete order detail successfully with id " + id);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

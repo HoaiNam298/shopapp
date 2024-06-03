@@ -1,7 +1,10 @@
 package com.project.shopapp.controller;
 
 import com.project.shopapp.dtos.OrderDTO;
+import com.project.shopapp.model.Order;
+import com.project.shopapp.services.OrderService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -11,7 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${api.prefix}/orders")
+@RequiredArgsConstructor
 public class OderController {
+
+    private final OrderService orderService;
 
     @PostMapping("")
     public ResponseEntity<?> createOrder(
@@ -26,17 +32,35 @@ public class OderController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessage);
             }
-            return ResponseEntity.ok("Create Order successfully");
+            Order order = orderService.createOrder(orderDTO);
+            return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @GetMapping("/{user_id}")
-    public ResponseEntity<?> getOrders(
+    @GetMapping("/user/{user_id}")
+    public ResponseEntity<?> getOrdersByUser(
             @Valid @PathVariable("user_id") Long userId
     ) {
-        return ResponseEntity.ok("Get list order with user_id = " + userId);
+        try {
+            List<Order> orders = orderService.findByUserId(userId);
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrder(
+            @Valid @PathVariable("id") Long orderId
+    ) {
+        try {
+            Order order = orderService.getOrderById(orderId);
+            return ResponseEntity.ok(order);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
@@ -54,7 +78,8 @@ public class OderController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessage);
             }
-            return ResponseEntity.ok("Update order successfully");
+            Order order = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -66,6 +91,7 @@ public class OderController {
             @Valid @PathVariable Long id
     ) {
         // Xóa mềm update active = false
+        orderService.deleteOrder(id);
         return ResponseEntity.ok("Delete order successfully");
     }
 }
