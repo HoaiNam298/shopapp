@@ -29,23 +29,23 @@
 
 
 
-//////////// Register page ///////////
-
-// import { bootstrapApplication } from '@angular/platform-browser';
-// import { appConfig } from './app/app.config';
-// import { RegisterComponent } from './app/register/register.component';
-
-// bootstrapApplication(RegisterComponent, appConfig)
-//   .catch((err) => console.error(err));
-
-
-
-//////////// Register page ///////////
+////////// Register page ///////////
 
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
-import { DetailProductComponent } from './app/detail-product/detail-product.component';
+import { RegisterComponent } from './app/register/register.component';
 
-bootstrapApplication(DetailProductComponent, appConfig)
+bootstrapApplication(RegisterComponent, appConfig)
   .catch((err) => console.error(err));
+
+
+
+// //////////// detail product page ///////////
+
+// import { bootstrapApplication } from '@angular/platform-browser';
+// import { appConfig } from './app/app.config';
+// import { DetailProductComponent } from './app/detail-product/detail-product.component';
+
+// bootstrapApplication(DetailProductComponent, appConfig)
+//   .catch((err) => console.error(err));
   

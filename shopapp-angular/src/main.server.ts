@@ -44,24 +44,24 @@
 
 
 
-// /////////////// Register page //////////////
-
-// import { bootstrapApplication } from '@angular/platform-browser';
-// import { config } from './app/app.config.server';
-// import { RegisterComponent } from './app/register/register.component';
-
-// const bootstrap = () => bootstrapApplication(RegisterComponent, config);
-
-// export default bootstrap;
-
-
-
 /////////////// Register page //////////////
 
 import { bootstrapApplication } from '@angular/platform-browser';
 import { config } from './app/app.config.server';
-import { DetailProductComponent } from './app/detail-product/detail-product.component';
+import { RegisterComponent } from './app/register/register.component';
 
-const bootstrap = () => bootstrapApplication(DetailProductComponent, config);
+const bootstrap = () => bootstrapApplication(RegisterComponent, config);
 
 export default bootstrap;
+
+
+
+/////////////// detail product page //////////////
+
+// import { bootstrapApplication } from '@angular/platform-browser';
+// import { config } from './app/app.config.server';
+// import { DetailProductComponent } from './app/detail-product/detail-product.component';
+
+// const bootstrap = () => bootstrapApplication(DetailProductComponent, config);
+
+// export default bootstrap;
