@@ -5,6 +5,9 @@ import { HeaderComponent } from '../header/header.component';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { NgForm } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { response } from 'express';
 
 @Component({
   selector: 'app-register',
@@ -28,7 +31,7 @@ export class RegisterComponent {
   address: string;
   isAccepted: boolean;
 
-  constructor(){
+  constructor(private http: HttpClient, private router: Router){
     this.phone='';
     this.password='';
     this.retypePassword='';
@@ -52,7 +55,46 @@ export class RegisterComponent {
                     `address: ${this.address}` +
                     `dateOfBirth: ${this.dateOfBirth}` +
                     `isAccepted: ${this.isAccepted}`;
-    alert(message)
+    // alert(message);
+    const apiUrl = "http://localhost:6969/api/v1/users/register";
+    const registerData = {
+      "fullname": this.fullName,
+      "phone_number": this.phone,
+      "address": this.address,
+      "password": this.password,
+      "retype_password": this.retypePassword,
+      "date_of_birth": this.dateOfBirth,
+      "facebook_account_id": 0,
+      "google_account_id": 0,
+      "role_id": 1
+    }
+    
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+      //'Access-Control-Allow-Origin' : "*"
+    });
+
+    this.http.post(apiUrl, registerData, {headers: headers})
+      .subscribe({
+        next: (response: any) => {
+          debugger
+          //Xử lý kết quả khi trả về đăng ký thành công
+          if(response && (response.status === 200 || response.status === 201)) {
+            //Đăng ký thành coog, chuyển sang màn hình login
+            this.router.navigate(['/login']);
+          } else {
+            
+          }
+        },
+        complete() {
+          debugger
+        },
+        error(error: any) {
+          //Xử lý lỗi nếu có
+          debugger
+          console.error('Đăng ký không thành công: ', error);
+        },
+      });
   }
   checkPasswordsMatch(){
     if(this.password !== this.retypePassword) {
