@@ -5,9 +5,10 @@ import { HeaderComponent } from '../header/header.component';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { NgForm } from '@angular/forms';
-import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
+import { registerDto } from '../dtos/register.dto';
 
 @Component({
   selector: 'app-register',
@@ -16,8 +17,7 @@ import { UserService } from '../service/user.service';
     FooterComponent,
     HeaderComponent,
     FormsModule,
-    NgIf,
-    HttpClientModule
+    NgIf
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
@@ -61,7 +61,7 @@ export class RegisterComponent {
                     `isAccepted: ${this.isAccepted}`;
     // alert(message);
     
-    const registerData = {
+    const registerDto: registerDto = {
       "fullname": this.fullName,
       "phone_number": this.phone,
       "address": this.address,
@@ -75,7 +75,7 @@ export class RegisterComponent {
     
     
 
-    this.userService.register(registerData).subscribe({
+    this.userService.register(registerDto).subscribe({
       next: (response: any) => {
         debugger
         //Xử lý kết quả khi trả về đăng ký thành công
