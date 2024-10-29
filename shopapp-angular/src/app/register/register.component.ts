@@ -5,14 +5,15 @@ import { HeaderComponent } from '../header/header.component';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { NgForm } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { response } from 'express';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [RouterOutlet,
+  imports: [HttpClientModule,
+    RouterOutlet,
     FooterComponent,
     HeaderComponent,
     FormsModule,

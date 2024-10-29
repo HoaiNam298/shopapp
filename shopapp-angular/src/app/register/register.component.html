@@ -53,7 +53,7 @@
                         Password phải có ít nhất 3 ký tự
                     </p>
                     <p class="text-danger" 
-                        *ngIf="registerForm.controls['retypePassword'].hasError('paswordMismatch') && registerForm.form.touched">
+                        *ngIf="registerForm.controls['retypePassword']?.hasError('paswordMismatch') && registerForm.form.touched">
                         Password không khớp
                     </p>
                 </div>
@@ -77,7 +77,7 @@
                         id="date-of-birth">
                     <div class="divider-nospace"></div>
                     <p class="text-danger" 
-                        *ngIf="registerForm.controls['dateOfBirth'].hasError('invalidAge') && registerForm.form.touched">
+                        *ngIf="registerForm.controls['dateOfBirth']?.hasError('invalidAge') && registerForm.form.touched">
                         nạn chưa đủ 18 tuổi
                     </p>
                 </div>
