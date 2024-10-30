@@ -5,7 +5,6 @@ import { HeaderComponent } from '../header/header.component';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { NgForm } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
 import { registerDto } from '../dtos/register.dto';
