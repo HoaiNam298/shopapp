@@ -1,6 +1,7 @@
 package com.project.shopapp.services.Impl;
 
-import com.project.shopapp.components.JwtTokenUtil;
+import com.project.shopapp.components.JwtTokenUtils;
+import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.PermissionDenyException;
@@ -9,6 +10,7 @@ import com.project.shopapp.model.User;
 import com.project.shopapp.repositories.RoleRepository;
 import com.project.shopapp.repositories.UserRepository;
 import com.project.shopapp.services.UserService;
+import com.project.shopapp.ultils.MessageKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,20 +31,22 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
 
     private final AuthenticationManager authenticationManager;
+
+    private final LocalizationUtils localizationUtils;
 
     @Override
     public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new DataIntegrityViolationException("Phone number already exists");
+            throw new DataIntegrityViolationException(localizationUtils.getLocalizedMessage(MessageKeys.PHONE_EXISTS));
         }
         Role role = roleRepository.findById(userDTO.getRoleId())
-                .orElseThrow(() -> new DataNotFoundException("Role not found"));
+                .orElseThrow(() -> new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.ROLE_NOT_FOUND)));
         if (role.getName().toUpperCase().equals(Role.ADMIN)) {
-            throw new PermissionDenyException("You cannot register a admin account!");
+            throw new PermissionDenyException(localizationUtils.getLocalizedMessage(MessageKeys.CANNOT_REGISTER_ADMIN));
         }
 
         //conver từ userDTO sang user
@@ -70,14 +74,14 @@ public class UserServiceImpl implements UserService {
     public String login(String phoneNumber, String password) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if (optionalUser.isEmpty()) {
-            throw new DataNotFoundException("Invalid phone number or password");
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.INVALID_PHONE_NUMBER));
         }
         User existingUser = optionalUser.get();
         //check password
         if (existingUser.getFacebookAccountId() == 0
                 && existingUser.getGoogleAccountId() ==0) {
             if (!passwordEncoder.matches(password, existingUser.getPassword())) {
-                throw new BadCredentialsException("Wrong phone number or password");
+                throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PASS_WORD));
             }
         }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

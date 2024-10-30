@@ -3,9 +3,13 @@ package com.project.shopapp.controller;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.dtos.UserLoginDTO;
 import com.project.shopapp.model.User;
+import com.project.shopapp.response.LoginResponse;
+import com.project.shopapp.response.RegisterResponse;
 import com.project.shopapp.services.UserService;
+import com.project.shopapp.components.LocalizationUtils;
+import com.project.shopapp.ultils.MessageKeys;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -18,13 +22,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${api.prefix}/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(
+    public ResponseEntity<RegisterResponse> register(
             @Valid @RequestBody UserDTO userDTO,
             BindingResult result
             ) {
@@ -34,26 +39,40 @@ public class UserController {
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(errorMessage);
+                return ResponseEntity.badRequest().body(RegisterResponse.builder().build());
             }
             if (!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
-                return ResponseEntity.badRequest().body("Password and Retype password does not match");
+                return ResponseEntity.badRequest().body(RegisterResponse.builder()
+                        .message(localizationUtils.getLocalizedMessage(MessageKeys.PASSWORD_NOT_MATCH))
+                        .build());
             }
             User user = userService.createUser(userDTO);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(RegisterResponse.builder()
+                    .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_SUCCESSFULLY))
+                    .build());
         }catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(RegisterResponse.builder()
+                    .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_FAILED, e.getMessage()))
+                    .build());
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userLoginDTO){
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody UserLoginDTO userLoginDTO
+            ){
         // Kiểm tra thông tin đăng nhập và sinh token
         try {
             String token = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword());
-            return ResponseEntity.ok(token);
+
+            return ResponseEntity.ok(LoginResponse.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
+                            .token(token)
+                    .build());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(LoginResponse.builder()
+                    .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED, e.getMessage()))
+                    .build());
         }
         // Trả về token trong respon
 
