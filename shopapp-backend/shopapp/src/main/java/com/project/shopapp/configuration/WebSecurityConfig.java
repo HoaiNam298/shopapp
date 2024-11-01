@@ -36,24 +36,29 @@ public class WebSecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeHttpRequests(requests -> {
-                requests
-                        .requestMatchers(String.format("%s/users/register", apiPrefix),
-                                String.format("%s/users/login", apiPrefix))
+                .authorizeHttpRequests(requests -> {
+                    requests
+                        .requestMatchers(
+                                String.format("%s/users/register", apiPrefix),
+                                String.format("%s/users/login", apiPrefix),
+                                String.format("%s/roles", apiPrefix))
                         .permitAll()
+
+//                        .requestMatchers(
+//                                String.format("%s/roles**", apiPrefix)).permitAll()
 
                         //category
                         .requestMatchers(HttpMethod.GET,
-                                String.format("%s/category?", apiPrefix)).hasAnyRole(Role.USER, Role.ADMIN)
+                                String.format("%s/categories**", apiPrefix)).hasAnyRole(Role.USER, Role.ADMIN)
 
                         .requestMatchers(HttpMethod.POST,
-                                String.format("%s/category/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                                String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
                         .requestMatchers(HttpMethod.PUT,
-                                String.format("%s/category/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                                String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
                         .requestMatchers(HttpMethod.DELETE,
-                                String.format("%s/category/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                                String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
                         //Product
                         .requestMatchers(HttpMethod.GET,
@@ -94,7 +99,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,
                                 String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
                         .anyRequest().authenticated();
-            })
+                })
             .csrf(AbstractHttpConfigurer::disable);
         http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {
             @Override

@@ -5,7 +5,6 @@ import com.project.shopapp.model.Category;
 import com.project.shopapp.repositories.CategoryRepository;
 import com.project.shopapp.services.CategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
