@@ -92,14 +92,14 @@ public class ProductController {
 
             Product newProduct = productService.createProduct(productDTO);
 
-            return ResponseEntity.ok(newProduct );
+            return ResponseEntity.ok(newProduct);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
     }
 
-    @PostMapping(value = "uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     //http://localhost:6969/api/v1/product
     public ResponseEntity<?> uploadImages(
             @PathVariable("id") Long productId,
@@ -146,7 +146,7 @@ public class ProductController {
 
     }
 
-    @GetMapping("/images/{imageName}")
+    @GetMapping(value = "/images/{imageName}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName){
         try {
             Path imagePath = Paths.get("uploads/" + imageName);

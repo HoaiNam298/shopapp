@@ -34,20 +34,26 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> {
                     requests
-                        .requestMatchers(
+                        .requestMatchers(HttpMethod.POST,
                                 String.format("%s/users/register", apiPrefix),
                                 String.format("%s/users/login", apiPrefix),
-                                String.format("%s/roles", apiPrefix),
-                                String.format("%s/categories**", apiPrefix),
-                                String.format("%s/products**", apiPrefix))
+                                String.format("%s/products/uploads/**", apiPrefix))
                         .permitAll()
 
-//
+                        .requestMatchers(HttpMethod.GET,
+                                String.format("%s/roles", apiPrefix),
+                                String.format("%s/categories**", apiPrefix),
+                                String.format("%s/categories/**", apiPrefix),
+                                String.format("%s/products**", apiPrefix),
+                                String.format("%s/products/**", apiPrefix),
+                                String.format("%s/products/images/**", apiPrefix))
+                        .permitAll()
 
+                         //Category
                         .requestMatchers(HttpMethod.POST,
                                 String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
@@ -58,17 +64,8 @@ public class WebSecurityConfig {
                                 String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
                         //Product
-//                        .requestMatchers(HttpMethod.GET,
-//                                String.format("%s/products**", apiPrefix)).permitAll()
-
-                        .requestMatchers(HttpMethod.GET,
-                                String.format("%s/products/images/**", apiPrefix)).permitAll()
-
                         .requestMatchers(HttpMethod.POST,
                                 String.format("%s/products**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                        .requestMatchers(HttpMethod.POST,
-                                String.format("%s/products/uploads/**", apiPrefix)).permitAll()
 
                         .requestMatchers(HttpMethod.PUT,
                                 String.format("%s/products**", apiPrefix)).hasAnyRole(Role.ADMIN)
