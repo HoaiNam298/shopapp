@@ -1,7 +1,9 @@
 package com.project.shopapp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.project.shopapp.model.Role;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data
@@ -16,4 +18,7 @@ public class UserLoginDTO {
 
     @NotBlank(message = "Password can not be blank")
     private String password;
+
+    @JsonProperty("role_id")
+    private Long roleId;
 }
