@@ -52,7 +52,8 @@ public class ProductController {
     ){
         PageRequest pageRequest = PageRequest.of(
                 page, limit,
-                Sort.by("createdAt").descending());
+//                Sort.by("createdAt").descending());
+                Sort.by("id").ascending());
         Page<ProductResponse> productPage = productService.getAllProduct(pageRequest);
 
         //Lấy tổng số trang
