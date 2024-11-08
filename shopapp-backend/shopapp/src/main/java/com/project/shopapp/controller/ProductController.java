@@ -47,14 +47,16 @@ public class ProductController {
 
     @GetMapping("") //http://localhost:6969/api/v1/product?page=3&limit=10
     public ResponseEntity<?> getAll(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int limit
     ){
         PageRequest pageRequest = PageRequest.of(
                 page, limit,
 //                Sort.by("createdAt").descending());
                 Sort.by("id").ascending());
-        Page<ProductResponse> productPage = productService.getAllProduct(pageRequest);
+        Page<ProductResponse> productPage = productService.getAllProduct(keyword, categoryId, pageRequest);
 
         //Lấy tổng số trang
         int totalPages = productPage.getTotalPages();
@@ -158,7 +160,9 @@ public class ProductController {
                         .contentType(MediaType.IMAGE_JPEG)
                         .body(resource);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(new UrlResource(Paths.get("uploads/notfound.png").toUri()));
             }
         } catch ( Exception e ) {
             return ResponseEntity.notFound().build();
