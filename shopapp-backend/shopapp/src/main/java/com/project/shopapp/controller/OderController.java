@@ -3,6 +3,7 @@ package com.project.shopapp.controller;
 import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.dtos.OrderDTO;
 import com.project.shopapp.model.Order;
+import com.project.shopapp.response.OrderResponse;
 import com.project.shopapp.services.OrderService;
 import com.project.shopapp.ultils.MessageKeys;
 import jakarta.validation.Valid;
@@ -35,8 +36,8 @@ public class OderController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessage);
             }
-            Order order = orderService.createOrder(orderDTO);
-            return ResponseEntity.ok(order);
+            Order orderResponse = orderService.createOrder(orderDTO);
+            return ResponseEntity.ok(orderResponse);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -60,7 +61,7 @@ public class OderController {
     ) {
         try {
             Order order = orderService.getOrderById(orderId);
-            return ResponseEntity.ok(order);
+            return ResponseEntity.ok(OrderResponse.fromOrder(order));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
