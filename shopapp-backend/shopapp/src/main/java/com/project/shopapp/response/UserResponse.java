@@ -47,6 +47,7 @@ public class UserResponse {
         return UserResponse.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
+                .phoneNumber(user.getPhoneNumber())
                 .address(user.getAddress())
                 .isActive(user.getIsActive())
                 .dateOfBirth(user.getDateOfBirth())

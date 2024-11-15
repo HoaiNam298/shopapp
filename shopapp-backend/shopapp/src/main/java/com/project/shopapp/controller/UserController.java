@@ -72,7 +72,7 @@ public class UserController {
                     .build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(LoginResponse.builder()
-                    .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED, e.getMessage()))
+                    .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED))
                     .build());
         }
         // Trả về token trong respon

@@ -61,6 +61,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         newUser.setRole(role);
+        newUser.setIsActive(true);
         //Kiểm tra nếu có accountId, không yêu cầu password
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() ==0) {
             String password = userDTO.getPassword();
