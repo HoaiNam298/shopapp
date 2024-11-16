@@ -34,13 +34,13 @@ public class UserResponse {
     @JsonProperty("date_of_birth")
     private Date dateOfBirth;
 
-    @Column(name = "facebook_account_id")
+    @JsonProperty("facebook_account_id")
     private int facebookAccountId;
 
-    @Column(name = "google_account_id")
+    @JsonProperty("google_account_id")
     private int googleAccountId;
 
-    @JoinColumn(name = "role_id ")
+    @JsonProperty("role_id ")
     private Role role;
 
     public static UserResponse fromUser(User user) {
