@@ -2,6 +2,7 @@ package com.project.shopapp.services.Impl;
 
 import com.project.shopapp.components.JwtTokenUtils;
 import com.project.shopapp.components.LocalizationUtils;
+import com.project.shopapp.dtos.UpdateUserDTO;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.PermissionDenyException;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -38,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final LocalizationUtils localizationUtils;
 
     @Override
+    @Transactional
     public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
@@ -118,4 +121,48 @@ public class UserServiceImpl implements UserService {
             throw new Exception("User not found");
         }
     }
+
+    @Override
+    @Transactional
+    public User updateUser(Long userId, UpdateUserDTO updatedUserDTO) throws Exception {
+        // Tìm user theo ID
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataIntegrityViolationException(localizationUtils.getLocalizedMessage(MessageKeys.USER_NOT_FOUND)));
+
+        // Kiểm tra nếu số điện thoại mới đã tồn tại và không phải của chính user đang cập nhật
+        String newPhoneNumber = updatedUserDTO.getPhoneNumber();
+        if (!existingUser.getPhoneNumber().equals(newPhoneNumber) && userRepository.existsByPhoneNumber(newPhoneNumber)) {
+            throw new DataIntegrityViolationException(localizationUtils.getLocalizedMessage(MessageKeys.PHONE_EXISTS));
+        }
+
+        // Cập nhật thông tin từ DTO
+        existingUser.setFullName(
+                updatedUserDTO.getFullName() != null ? updatedUserDTO.getFullName() : existingUser.getFullName()
+        );
+        existingUser.setPhoneNumber(
+                updatedUserDTO.getPhoneNumber() != null ? updatedUserDTO.getPhoneNumber() : existingUser.getPhoneNumber()
+        );
+        existingUser.setAddress(
+                updatedUserDTO.getAddress() != null ? updatedUserDTO.getAddress() : existingUser.getAddress()
+        );
+        existingUser.setDateOfBirth(
+                updatedUserDTO.getDateOfBirth() != null ? updatedUserDTO.getDateOfBirth() : existingUser.getDateOfBirth()
+        );
+        existingUser.setFacebookAccountId(
+                updatedUserDTO.getFacebookAccountId() > 0 ? updatedUserDTO.getFacebookAccountId() : existingUser.getFacebookAccountId()
+        );
+        existingUser.setGoogleAccountId(
+                updatedUserDTO.getGoogleAccountId() > 0 ? updatedUserDTO.getGoogleAccountId() : existingUser.getGoogleAccountId()
+        );
+//        existingUser.setRole(role);
+
+        // Nếu tài khoản liên kết Facebook/Google không tồn tại và có thay đổi mật khẩu
+        if (updatedUserDTO.getPassword() != null && updatedUserDTO.getFacebookAccountId() == 0 && updatedUserDTO.getGoogleAccountId() == 0) {
+            String encodedPassword = passwordEncoder.encode(updatedUserDTO.getPassword());
+            existingUser.setPassword(encodedPassword);
+        }
+
+        return userRepository.save(existingUser);
+    }
+
 }

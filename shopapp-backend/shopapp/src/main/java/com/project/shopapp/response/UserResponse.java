@@ -40,7 +40,7 @@ public class UserResponse {
     @JsonProperty("google_account_id")
     private int googleAccountId;
 
-    @JsonProperty("role_id ")
+    @JsonProperty("role")
     private Role role;
 
     public static UserResponse fromUser(User user) {

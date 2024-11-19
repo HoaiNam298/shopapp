@@ -4,6 +4,8 @@ public class MessageKeys {
     public static final String LOGIN_SUCCESSFULLY = "user.login.login_successfully";
     public static final String LOGIN_FAILED = "user.login.login_failed";
     public static final String USER_IS_LOCKED = "user.user_locked";
+    public static final String USER_NOT_FOUND = "user.user_not_found";
+    public static final String CANNOT_UPDATE_TO_ADMIN = "user.cannot_update_to_admin";
     public static final String WRONG_PASS_WORD = "user.login.wrong_pass_word";
     public static final String INVALID_PHONE_NUMBER = "user.login.invalid_phone_number";
 

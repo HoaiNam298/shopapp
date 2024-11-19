@@ -54,6 +54,12 @@ public class WebSecurityConfig {
                                 String.format("%s/products/images/**", apiPrefix))
                         .permitAll()
 
+                            //User
+//                        .requestMatchers(HttpMethod.POST,
+//                                String.format("%s/users/details", apiPrefix)).hasRole(Role.USER)
+//                        .requestMatchers(HttpMethod.PUT,
+//                                String.format("%s/users/details/**", apiPrefix)).hasRole(Role.USER)
+
                          //Category
                         .requestMatchers(HttpMethod.POST,
                                 String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
