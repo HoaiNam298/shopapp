@@ -80,13 +80,23 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/products", apiPrefix), "GET"),
                 Pair.of(String.format("%s/categories", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products", apiPrefix), "POST"),
-                Pair.of(String.format("%s/orders", apiPrefix), "GET"),
+//                Pair.of(String.format("%s/orders", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
                 Pair.of(String.format("%s/users/login", apiPrefix), "POST")
         );
+
+        String requestPath = request.getServletPath();
+        String requestMethod = request.getMethod();
+
+        if (requestPath.equals(String.format("%s/orders", apiPrefix))
+            && requestMethod.equals("GET")) {
+            //Allow access to %s/orders
+            return true;
+        }
+
         for (Pair<String, String> bypassToken : bypassTokens) {
-            if (request.getServletPath().contains(bypassToken.getFirst()) &&
-                    request.getMethod().equals(bypassToken.getSecond())) {
+            if (requestPath.contains(bypassToken.getFirst()) &&
+                    requestMethod.equals(bypassToken.getSecond())) {
                 return true;
             }
         }

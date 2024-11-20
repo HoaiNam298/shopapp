@@ -44,7 +44,7 @@ public class ProductController {
     private final LocalizationUtils localizationUtils;
 
     @GetMapping("") //http://localhost:6969/api/v1/product?page=3&limit=10
-    public ResponseEntity<?> getAll(
+    public ResponseEntity<ProductListResponse> getAll(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") Long categoryId,
             @RequestParam(defaultValue = "0") int page,
