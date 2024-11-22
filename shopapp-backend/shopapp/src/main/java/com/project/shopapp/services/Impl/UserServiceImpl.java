@@ -155,9 +155,14 @@ public class UserServiceImpl implements UserService {
                 updatedUserDTO.getGoogleAccountId() > 0 ? updatedUserDTO.getGoogleAccountId() : existingUser.getGoogleAccountId()
         );
 //        existingUser.setRole(role);
-
         // Nếu tài khoản liên kết Facebook/Google không tồn tại và có thay đổi mật khẩu
-        if (updatedUserDTO.getPassword() != null && updatedUserDTO.getFacebookAccountId() == 0 && updatedUserDTO.getGoogleAccountId() == 0) {
+        if (updatedUserDTO.getPassword() != null
+                && !updatedUserDTO.getPassword().isEmpty()
+                && updatedUserDTO.getFacebookAccountId() == 0
+                && updatedUserDTO.getGoogleAccountId() == 0) {
+            if (!updatedUserDTO.getPassword().equals(updatedUserDTO.getRetypePassword())) {
+                throw new DataNotFoundException("Password and retype password not the same");
+            }
             String encodedPassword = passwordEncoder.encode(updatedUserDTO.getPassword());
             existingUser.setPassword(encodedPassword);
         }

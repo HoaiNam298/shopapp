@@ -13,7 +13,8 @@ import com.project.shopapp.services.ProductService;
 import com.project.shopapp.ultils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,13 +41,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
     private final ProductService productService;
     private final LocalizationUtils localizationUtils;
 
     @GetMapping("") //http://localhost:6969/api/v1/product?page=3&limit=10
     public ResponseEntity<ProductListResponse> getAll(
             @RequestParam(defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "0") Long categoryId,
+            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int limit
     ){
@@ -54,6 +56,7 @@ public class ProductController {
                 page, limit,
 //                Sort.by("createdAt").descending());
                 Sort.by("id").ascending());
+        logger.info("keyword = %s, category_id = %d, limit = %d");
         Page<ProductResponse> productPage = productService.getAllProduct(keyword, categoryId, pageRequest);
 
         //Lấy tổng số trang

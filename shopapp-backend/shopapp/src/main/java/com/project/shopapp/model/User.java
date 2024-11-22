@@ -6,6 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -40,7 +42,7 @@ public class User extends BaseEntity implements UserDetails {
     private Boolean isActive;
 
     @Column(name = "date_of_birth", length = 300)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "facebook_account_id")
     private int facebookAccountId;

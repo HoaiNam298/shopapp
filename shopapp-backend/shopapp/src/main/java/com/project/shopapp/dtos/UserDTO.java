@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -29,7 +31,7 @@ public class UserDTO {
     private String retypePassword;
 
     @JsonProperty("date_of_birth")
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @JsonProperty("facebook_account_id")
     private int facebookAccountId;

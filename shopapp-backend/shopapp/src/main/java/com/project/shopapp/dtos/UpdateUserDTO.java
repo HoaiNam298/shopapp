@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 @Data
 @Builder
@@ -24,8 +26,11 @@ public class UpdateUserDTO {
 
     private String password;
 
+    @JsonProperty("retype_password")
+    private String retypePassword;
+
     @JsonProperty("date_of_birth")
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @JsonProperty("facebook_account_id")
     private int facebookAccountId;

@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -32,7 +34,7 @@ public class UserResponse {
     private Boolean isActive;
 
     @JsonProperty("date_of_birth")
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @JsonProperty("facebook_account_id")
     private int facebookAccountId;
