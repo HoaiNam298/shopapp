@@ -25,7 +25,7 @@ import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
-@EnableWebSecurity(debug = true)
+//@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
@@ -55,7 +55,8 @@ public class WebSecurityConfig {
                                 String.format("%s/products**", apiPrefix),
                                 String.format("%s/products/**", apiPrefix),
                                 String.format("%s/orders/**", apiPrefix),
-                                String.format("%s/products/images/**", apiPrefix))
+                                String.format("%s/products/images/**", apiPrefix),
+                                String.format("%s/healthcheck/**", apiPrefix))
                         .permitAll()
 
                          //Admin

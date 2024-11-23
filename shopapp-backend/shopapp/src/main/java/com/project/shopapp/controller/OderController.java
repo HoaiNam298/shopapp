@@ -67,8 +67,9 @@ public class OderController {
             @Valid @PathVariable("id") Long orderId
     ) {
         try {
-            Order order = orderService.getOrderById(orderId);
-            return ResponseEntity.ok(OrderResponse.fromOrder(order));
+            Order orderExisting = orderService.getOrderById(orderId);
+            OrderResponse orderResponse = OrderResponse.fromOrder(orderExisting);
+            return ResponseEntity.ok(orderResponse);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -82,13 +83,13 @@ public class OderController {
             BindingResult result
     ){
         try {
-            if (result.hasErrors()) {
-                List<String> errorMessage = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessage);
-            }
+//            if (result.hasErrors()) {
+//                List<String> errorMessage = result.getFieldErrors()
+//                        .stream()
+//                        .map(FieldError::getDefaultMessage)
+//                        .toList();
+//                return ResponseEntity.badRequest().body(errorMessage);
+//            }
             Order order = orderService.updateOrder(id, orderDTO);
             return ResponseEntity.ok(order);
         } catch (Exception e) {

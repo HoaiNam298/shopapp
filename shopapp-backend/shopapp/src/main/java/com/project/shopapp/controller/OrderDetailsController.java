@@ -37,7 +37,7 @@ public class OrderDetailsController {
                 return ResponseEntity.badRequest().body(errorMessage);
             }
             OrderDetail newOrderDetail = orderDetailService.createOrderDetail(orderDetailDTO);
-            return ResponseEntity.ok(OrderDetailResponse.fromeOrderDetail(newOrderDetail));
+            return ResponseEntity.ok(OrderDetailResponse.fromOrderDetail(newOrderDetail));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -49,7 +49,7 @@ public class OrderDetailsController {
     ) {
         try {
             OrderDetail orderDetail = orderDetailService.getOrderDetail(id);
-            return ResponseEntity.ok(OrderDetailResponse.fromeOrderDetail(orderDetail));
+            return ResponseEntity.ok(OrderDetailResponse.fromOrderDetail(orderDetail));
 //            return orderDetail;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -65,7 +65,7 @@ public class OrderDetailsController {
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(orderId);
             List<OrderDetailResponse> orderDetailResponses = orderDetails
                     .stream()
-                    .map(OrderDetailResponse::fromeOrderDetail)
+                    .map(OrderDetailResponse::fromOrderDetail)
                     .toList();
             return ResponseEntity.ok(orderDetailResponses);
 //            return ResponseEntity.ok(orderDetails);

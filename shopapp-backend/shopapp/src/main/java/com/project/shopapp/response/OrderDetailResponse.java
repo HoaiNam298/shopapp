@@ -31,7 +31,7 @@ public class OrderDetailResponse {
     @JsonProperty("product_id")
     private Long productId;
 
-    public static OrderDetailResponse fromeOrderDetail(OrderDetail orderDetail) {
+    public static OrderDetailResponse fromOrderDetail(OrderDetail orderDetail) {
         return OrderDetailResponse
                 .builder()
                 .id(orderDetail.getId())

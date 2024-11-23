@@ -18,7 +18,7 @@ import java.util.List;
 public class OrderDTO {
 
     @JsonProperty("user_id")
-    @Min(value = 1, message = "User's id must be > 0")
+//    @Min(value = 1, message = "User's id must be > 0")
     private Long userId;
 
     @JsonProperty("fullname")
@@ -27,16 +27,21 @@ public class OrderDTO {
     private String email;
 
     @JsonProperty("phone_number")
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[0-9]{10}$", message = "Invalid phone number format. Must be 10 digits.")
+//    @NotBlank(message = "Phone number is required")
+//    @Pattern(regexp = "^[0-9]{10}$", message = "Invalid phone number format. Must be 10 digits.")
     private String phoneNumber;
 
     private String address;
 
     private String note;
 
+    private String status;
+
+    @JsonProperty("order_date")
+    private LocalDate orderDate;
+
     @JsonProperty("total_money")
-    @Min(value = 0, message = "Total money must be >= 0")
+//    @Min(value = 0, message = "Total money must be >= 0")
     private Float totalMoney;
 
     @JsonProperty("shipping_method")

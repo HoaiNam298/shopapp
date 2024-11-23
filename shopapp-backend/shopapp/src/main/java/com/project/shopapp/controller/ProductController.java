@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+//    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
     private final ProductService productService;
     private final LocalizationUtils localizationUtils;
 
@@ -56,7 +56,7 @@ public class ProductController {
                 page, limit,
 //                Sort.by("createdAt").descending());
                 Sort.by("id").ascending());
-        logger.info("keyword = %s, category_id = %d, limit = %d");
+//        logger.info("keyword = %s, category_id = %d, limit = %d");
         Page<ProductResponse> productPage = productService.getAllProduct(keyword, categoryId, pageRequest);
 
         //Lấy tổng số trang

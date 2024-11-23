@@ -1,6 +1,7 @@
 package com.project.shopapp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,9 +25,11 @@ public class OrderDetail {
     private Float price;
 
     @Column(name = "number_of_products", nullable = false)
+//    @JsonProperty("number_of_products")
     private int numberOfProducts;
 
     @Column(name = "total_money", nullable = false)
+//    @JsonProperty("total_money")
     private Float totalMoney;
 
     @Column(name = "color", length = 20)

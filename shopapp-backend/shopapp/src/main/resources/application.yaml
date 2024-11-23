@@ -25,6 +25,8 @@ spring:
     basename: i18n/messages
     encoding: UTF-8
     default-locale: en
+  jackson:
+    property-naming-strategy: SNAKE_CASE
 
 api:
   prefix: api/v1
@@ -33,4 +35,4 @@ jwt:
   expiration: 86400 #30 days: 30 * 24 * 60 * 60
   secretKey: 2bBXzdplW1CbCQqvzmHApdmM91XrxbrJqtgUfQJSEWk=
 
-logging.level.org.springframework.security: DEBUG
+#logging.level.org.springframework.security: DEBUG
