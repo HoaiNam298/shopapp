@@ -107,8 +107,10 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,
                                 String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
                         .anyRequest().authenticated();
-                })
-            .csrf(AbstractHttpConfigurer::disable);
+                });
+//        http.securityMatcher(String.valueOf(EndpointRequesst.toAnyEndpoint()));
+
+        /*
         http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {
             @Override
             public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
@@ -122,6 +124,7 @@ public class WebSecurityConfig {
                 httpSecurityCorsConfigurer.configurationSource(source);
             }
         });
+         */
         return http.build();
 
     }
