@@ -7,10 +7,13 @@ import com.project.shopapp.model.User;
 import com.project.shopapp.response.LoginResponse;
 import com.project.shopapp.response.RegisterResponse;
 import com.project.shopapp.response.UserResponse;
+import com.project.shopapp.services.TokenService;
 import com.project.shopapp.services.UserService;
 import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.ultils.MessageKeys;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,7 @@ public class UserController {
 
     private final UserService userService;
     private final LocalizationUtils localizationUtils;
+    private final TokenService tokenService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
@@ -57,9 +61,14 @@ public class UserController {
         }
     }
 
+    private boolean isMobileDevice(String userAgent) {
+        return userAgent.toLowerCase().contains("mobile");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody UserLoginDTO userLoginDTO
+            @Valid @RequestBody UserLoginDTO userLoginDTO,
+            HttpServletRequest request
             ){
         // Kiểm tra thông tin đăng nhập và sinh token
         try {
@@ -67,6 +76,10 @@ public class UserController {
                     userLoginDTO.getPhoneNumber(),
                     userLoginDTO.getPassword(),
                     userLoginDTO.getRoleId() == null ? 1 : userLoginDTO.getRoleId());
+
+            String userAgent = request.getHeader("User-Agent");
+            User user = userService.getUserDetailsFromToken(token);
+            tokenService.addToken(user, token, isMobileDevice(userAgent));
 
             return ResponseEntity.ok(LoginResponse.builder()
                             .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))

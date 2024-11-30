@@ -32,6 +32,9 @@ public class Token {
     private Boolean revoked; //hủy chưa
     private Boolean expired; //hết hạn chưa
 
+    @Column(name = "is_mobile")
+    private Boolean isMobile; //Là mobile hay không
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
