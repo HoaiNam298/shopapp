@@ -1,8 +1,10 @@
 package com.project.shopapp.controller;
 
+import com.project.shopapp.dtos.RefreshTokenDTO;
 import com.project.shopapp.dtos.UpdateUserDTO;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.dtos.UserLoginDTO;
+import com.project.shopapp.model.Token;
 import com.project.shopapp.model.User;
 import com.project.shopapp.response.LoginResponse;
 import com.project.shopapp.response.RegisterResponse;
@@ -79,12 +81,18 @@ public class UserController {
 
             String userAgent = request.getHeader("User-Agent");
             User user = userService.getUserDetailsFromToken(token);
-            tokenService.addToken(user, token, isMobileDevice(userAgent));
+            Token jwtToken = tokenService.addToken(user, token, isMobileDevice(userAgent));
 
             return ResponseEntity.ok(LoginResponse.builder()
                             .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
-                            .token(token)
-                    .build());
+                            .id(user.getId())
+                            .token(jwtToken.getToken())
+                            .tokenType(jwtToken.getTokenType())
+                            .refreshToken(jwtToken.getRefreshToken())
+                            .username(user.getPhoneNumber())
+                            .roles(user.getAuthorities().stream()
+                                    .map(item -> item.getAuthority()).toList())
+                            .build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(LoginResponse.builder()
                     .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED))
@@ -92,6 +100,30 @@ public class UserController {
         }
         // Trả về token trong respon
 
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<LoginResponse> refreshToken(
+            @Valid @RequestBody RefreshTokenDTO refreshTokenDTO
+    ) {
+        try {
+            User user = userService.getUserDetailsFromRefreshToken(refreshTokenDTO.getRefreshToken());
+            Token jwtToken = tokenService.refreshToken(refreshTokenDTO.getRefreshToken(), user);
+            return ResponseEntity.ok(LoginResponse.builder()
+                    .id(user.getId())
+                    .message("Refresh toke successfully")
+                    .token(jwtToken.getToken())
+                    .tokenType(jwtToken.getTokenType())
+                    .refreshToken(jwtToken.getRefreshToken())
+                    .username(user.getPhoneNumber())
+                    .roles(user.getAuthorities().stream()
+                            .map(item -> item.getAuthority()).toList())
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(LoginResponse.builder()
+                    .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED))
+                    .build());
+        }
     }
 
     @PostMapping("/details")

@@ -45,6 +45,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 String.format("%s/users/register", apiPrefix),
                                 String.format("%s/users/login", apiPrefix),
+                                String.format("%s/users/refresh-token", apiPrefix),
                                 String.format("%s/products/uploads/**", apiPrefix))
                         .permitAll()
 

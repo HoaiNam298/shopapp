@@ -32,7 +32,8 @@ api:
   prefix: api/v1
 
 jwt:
-  expiration: 86400 #30 days: 30 * 24 * 60 * 60
+  expiration: 2592000 #30 days: 30 * 24 * 60 * 60
+  expiration-refresh-token: 5184000 #60 days: 30 * 24 * 60 * 60
   secretKey: 2bBXzdplW1CbCQqvzmHApdmM91XrxbrJqtgUfQJSEWk=
 
 #logging.level.org.springframework.security: DEBUG
