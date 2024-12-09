@@ -1,0 +1,127 @@
+@import '../../styles/shared-style.scss';
+
+.intro-section {
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.product-category {
+  width: 200px;
+  color: black;
+}
+
+select option {
+  background-color: gray;
+}
+
+.search-input {
+  width: 300px;
+  background-color: rgb(19, 23, 42);
+  margin-right: 10px;
+  color: white;
+}
+
+.form-control {
+  background-color: transparent;
+  color: white;
+}
+
+.form-control:-ms-input-placeholder {
+  color: rgb(255, 255, 255, 0.5);
+  /* Internet Explorer 10-11 */
+}
+
+.form-control::-ms-input-placeholder {
+  color: rgb(255, 255, 255, 0.5);
+  /* Microsoft Edge */
+}
+
+.form-control::placeholder {
+  color: rgb(255, 255, 255, 0.5);
+  /* Firefox, Chrome, Opera */
+}
+
+.product-item {
+  background-color: rgb(19, 23, 42);
+  border: 1px solid rgb(35, 39, 61);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.product-image {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Đảm bảo khung chứa có dạng hình vuông */
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo ảnh bao phủ toàn bộ khu vực hình vuông */
+}
+
+
+.product-name {
+  color: white;
+}
+
+.product-description {
+  color: rgb(173, 178, 203);
+}
+
+.product-warranty {
+  color: rgb(242, 126, 212);
+}
+
+.product-price {
+  color: white;
+}
+
+.product-rating {
+  color: #ffd700;
+  margin-top: 10px;
+}
+
+.product-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.space-x {
+  margin: 0 5px;
+  /* top right bottom left */
+}
+
+.page-number {
+  cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  margin: 0 2px;
+  border-radius: 3px;
+}
+
+.page-number.active {
+  background-color: $btn-color;
+  color: #fff;
+  border-color: $btn-color;
+}
+
+.btn-primary {
+  background-color: $btn-color;
+  border-color: $btn-color;
+}
+
+.btn.btn-primary {
+  margin-left: 10px;
+}
