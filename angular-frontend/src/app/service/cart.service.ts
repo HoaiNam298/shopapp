@@ -16,7 +16,7 @@ export class CartService {
   ) { 
     //Lấy dữ liệu giỏ hành từ localStorage khi khởi tạo service
     this.localStorage = document.defaultView?.localStorage
-    
+    this.refreshCart();
   }
 
   public refreshCart(){
@@ -32,7 +32,7 @@ export class CartService {
     const userResponseJSON = this.localStorage?.getItem('user');
     const userResponse = JSON.parse(userResponseJSON!);
     debugger;
-    return `cart: ${userResponse.id}`;
+    return `cart: ${userResponse?.id ?? ''}`;
   }
 
   addToCard(productId: number, quantity: number): void {
@@ -54,7 +54,7 @@ export class CartService {
   }
 
   //Lưu trữ giỏ hành vào localStorage
-  saveCartToLocalStorage(): void {
+  private saveCartToLocalStorage(): void {
     debugger
     this.localStorage?.setItem(this.getCartKey(), JSON.stringify(Array.from(this.cart.entries())));
   }

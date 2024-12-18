@@ -32,7 +32,6 @@ export class TokenService {
         debugger
         const token = this.getToken();
         if (!token) {
-            console.error("Token is null or undefined");
             return 0;
         }
         console.log("Token: ", token)
