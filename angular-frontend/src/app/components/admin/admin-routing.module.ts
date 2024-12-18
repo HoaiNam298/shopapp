@@ -7,7 +7,7 @@ import { CategoryAdminComponent } from './category/category.admin.component';
 import { DetailOrderAdminComponent } from './detail-order/detail-order.admin.component';
 import { AdminGuard } from '../../guards/admin.guard';
 
-const routes: Routes = [
+export const adminRoutes: Routes = [
   { path: 'admin', 
     component: AdminComponent,
     children: [
@@ -32,9 +32,3 @@ const routes: Routes = [
    },
 
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class AdminRoutingModule { }

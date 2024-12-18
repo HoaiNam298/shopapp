@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UserResponse } from '../../responses/user/user.response';
 import { UserService } from '../../service/user.service';
 import { TokenService } from '../../service/token.service';
@@ -8,7 +8,10 @@ import { TokenService } from '../../service/token.service';
   standalone: true,
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss']
+  styleUrls: ['./admin.component.scss'],
+  imports: [
+    RouterModule
+  ]
 })
 export class AdminComponent implements OnInit {
 

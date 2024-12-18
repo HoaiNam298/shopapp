@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Role } from '../../models/role';
 import { UserResponse } from '../../responses/user/user.response';
@@ -24,7 +24,8 @@ import { FooterComponent } from '../footer/footer.component';
     CommonModule,
     FormsModule,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    RouterModule
   ]
 })
 export class LoginComponent implements OnInit {

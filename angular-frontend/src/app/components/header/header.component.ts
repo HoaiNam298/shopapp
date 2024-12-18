@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NgbPopoverConfig } from '@ng-bootstrap/ng-bootstrap';
 import { UserResponse } from '../../responses/user/user.response';
 import { UserService } from '../../service/user.service';
@@ -14,7 +14,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./header.component.scss'],
   imports: [
     CommonModule,
-    NgbModule
+    NgbModule,
+    RouterModule
   ]
 })
 export class HeaderComponent implements OnInit {

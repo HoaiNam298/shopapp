@@ -11,16 +11,16 @@ import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 
 @Component({
-  standalone: true,
   selector: 'app-detail-product',
-  templateUrl: './detail-product.component.html',
-  styleUrls: ['./detail-product.component.scss'],
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     HeaderComponent,
     FooterComponent
-  ]
+  ],
+  templateUrl: './detail-product.component.html',
+  styleUrl: './detail-product.component.scss'
 })
 export class DetailProductComponent implements OnInit{
   product?: Product;

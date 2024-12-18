@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Product } from '../../models/product';
 import { Category } from '../../models/category';
 import { ProductService } from '../../service/product.service';
@@ -19,7 +19,8 @@ import { FooterComponent } from '../footer/footer.component';
     CommonModule,
     FormsModule,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    RouterModule
   ]
 })
 export class HomeComponent implements OnInit {

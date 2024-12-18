@@ -10,6 +10,7 @@ export class TokenIntercepter implements HttpInterceptor{
     constructor(private tokenService: TokenService) {}
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        debugger
         const token = this.tokenService.getToken();
         if(token) {
             //Nhân bản req để sử rồi lấy thằng cũ tham chiếu lại thằng mới để lưu

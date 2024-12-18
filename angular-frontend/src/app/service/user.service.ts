@@ -1,11 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { registerDto } from '../dtos/user/register.dto';
 import { LoginDto } from '../dtos/user/login.dto';
 import { enviroment } from '../enviroments/enviroment';
 import { UserResponse } from '../responses/user/user.response';
 import { UpdateUserDTO } from '../dtos/user/update.user.dto';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -15,12 +16,18 @@ export class UserService {
   private apiUrlRegister = `${enviroment.apiBaseUrl}/users/register`;
   private apiUrlLogin = `${enviroment.apiBaseUrl}/users/login`;
   private apiUserDetails = `${enviroment.apiBaseUrl}/users/details`;
+  localStorage?: Storage;
   
   private apiConfig = {
     headers : this.createHeader(),
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    @Inject(DOCUMENT) private document: Document
+) {
+    this.localStorage = document.defaultView?.localStorage
+}
 
   private createHeader(): HttpHeaders{
     return new HttpHeaders({
@@ -71,7 +78,7 @@ export class UserService {
           ? new Date(userResponse.date_of_birth).toISOString() // Đảm bảo chuyển đổi thành ISO
           : null, // Nếu `date_of_birth` không hợp lệ, lưu null
       });
-      localStorage.setItem('user', userResponseJSON);
+      this.localStorage?.setItem('user', userResponseJSON);
       console.log("User saved to local storage")
     } catch (error) {
       console.error('Error saving user response to local storage', error);
@@ -80,7 +87,7 @@ export class UserService {
 
   getUserResponseFromLocalStorage(): UserResponse | null {
     try {
-      const userResponseJSON = localStorage.getItem('user');
+      const userResponseJSON = this.localStorage?.getItem('user');
 
       if(userResponseJSON == null || userResponseJSON==undefined) {
         return null;
@@ -97,7 +104,7 @@ export class UserService {
 
   removeUserFromLocalStorage(): void{
     try {
-      localStorage.removeItem('user');
+      this.localStorage?.removeItem('user');
       console.log('User data removed from local storage.');
     } catch (error) {
       console.error("Error removing user data from local storage: ", error);

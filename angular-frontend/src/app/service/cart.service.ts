@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { ProductService } from './product.service';
+import { DOCUMENT } from '@angular/common';
 // import { LocalStorageService } from 'ngx-webstorage'
 
 @Injectable({
@@ -8,18 +9,31 @@ import { ProductService } from './product.service';
 export class CartService {
 
   private cart: Map<number, number> = new Map();
+  localStorage?: Storage;
 
-  constructor(private productService: ProductService) { 
+  constructor(
+    @Inject(DOCUMENT) private document: Document
+  ) { 
     //Lấy dữ liệu giỏ hành từ localStorage khi khởi tạo service
-
-    const storedCard = localStorage.getItem(this.getCartKey());
+    this.localStorage = document.defaultView?.localStorage
+    const storedCard = this.localStorage?.getItem('cart');
     if(storedCard) {
         this.cart = new Map(JSON.parse(storedCard));
+    }
+    
+  }
+
+  public refreshCart(){
+    const storedCard = this.localStorage?.getItem(this.getCartKey());
+    if(storedCard) {
+        this.cart = new Map(JSON.parse(storedCard));
+    } else {
+      this.cart = new Map<number, number>();
     }
   }
 
   getCartKey(): string {
-    const userResponseJSON = localStorage.getItem('user');
+    const userResponseJSON = this.localStorage?.getItem('user');
     const userResponse = JSON.parse(userResponseJSON!);
     debugger;
     return `cart: ${userResponse.id}`;
@@ -46,7 +60,7 @@ export class CartService {
   //Lưu trữ giỏ hành vào localStorage
   saveCartToLocalStorage(): void {
     debugger
-    localStorage.setItem(this.getCartKey(), JSON.stringify(Array.from(this.cart.entries())));
+    this.localStorage?.setItem(this.getCartKey(), JSON.stringify(Array.from(this.cart.entries())));
   }
 
   setCart(cart: Map<number, number>) {
@@ -57,14 +71,5 @@ export class CartService {
   clearCart(): void {
     this.cart.clear();
     this.saveCartToLocalStorage();
-  }
-
-  refreshCart(): void {
-    const storedCart = localStorage.getItem(this.getCartKey());
-    if(storedCart) {
-      this.cart = new Map(JSON.parse(storedCart));
-    } else {
-      this.cart = new Map<number, number>();
-    }
   }
 }
