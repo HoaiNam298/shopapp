@@ -16,10 +16,6 @@ export class CartService {
   ) { 
     //Lấy dữ liệu giỏ hành từ localStorage khi khởi tạo service
     this.localStorage = document.defaultView?.localStorage
-    const storedCard = this.localStorage?.getItem('cart');
-    if(storedCard) {
-        this.cart = new Map(JSON.parse(storedCard));
-    }
     
   }
 

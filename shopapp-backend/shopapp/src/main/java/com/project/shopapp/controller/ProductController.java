@@ -28,12 +28,16 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -192,6 +196,10 @@ public class ProductController {
         // Thêm UUID vào truớc tên file để đảm bảo tên file là duy nhất
         String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
         // Đường dẫn đến thư mục mà bạn muốn lưu file
+
+        // Thay đổi kích thước hình ảnh trước khi lưu
+        BufferedImage resizedImage = resizeImage(file);
+
         Path uploadDir = Paths.get("uploads");
         // Kiểm tra và tạo thư mục nếu nó không tồn tại
         if (!Files.exists(uploadDir)) {
@@ -202,6 +210,37 @@ public class ProductController {
         // Sao chép file vào thư mục đích
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
         return uniqueFilename;
+    }
+
+    // Phương thức thay đổi kích thước hình ảnh
+    private BufferedImage resizeImage(MultipartFile file) throws IOException {
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+
+        int maxSize = 1024; // Kích thước tối đa chiều rộng hoặc chiều cao
+        if (width > maxSize || height > maxSize) {
+            // Thay đổi kích thước hình ảnh theo tỷ lệ
+            double aspectRatio = (double) width / height;
+            if (width > height) {
+                width = maxSize;
+                height = (int) (width / aspectRatio);
+            } else {
+                height = maxSize;
+                width = (int) (height * aspectRatio);
+            }
+
+            // Tạo hình ảnh đã thay đổi kích thước
+            BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = resizedImage.createGraphics();
+            graphics.drawImage(originalImage, 0, 0, width, height, null);
+            graphics.dispose();
+
+            return resizedImage;
+        } else {
+            // Nếu hình ảnh đã đủ nhỏ, trả về hình ảnh gốc
+            return originalImage;
+        }
     }
 
     //Check có phải image không?? (cách 2)
