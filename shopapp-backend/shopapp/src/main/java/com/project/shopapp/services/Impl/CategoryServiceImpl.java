@@ -6,6 +6,7 @@ import com.project.shopapp.repositories.CategoryRepository;
 import com.project.shopapp.services.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
@@ -15,6 +16,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional
     public Category createCategory(CategoryDTO categoryDTO) {
         Category newCategory = Category
                 .builder()
@@ -35,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public Category updateCategory(CategoryDTO categoryDTO, long categoryId) {
         Category existingCategory = getCategoryById(categoryId);
         existingCategory.setName(categoryDTO.getName());
