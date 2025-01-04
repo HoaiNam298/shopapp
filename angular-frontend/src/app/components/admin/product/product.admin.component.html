@@ -21,30 +21,33 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let product of products; let i = index">
-                    <th scope="row">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</th>
-                    <td>{{ product.id }}</td>
-                    <td>{{ product.category_id }}</td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.price }}</td>
-                    <td>{{ product.description }}</td>
-                    <td>{{ product.created_at }}</td>
-                    <td>{{ product.updated_at }}</td>
-                    <td>
-                        <img [src]="product.url" (click)="onProductClick(product.id)"
-                            alt="Product Image" class="product-image">
-                    </td>
-                    <td class="text-center">
-                        <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-eye"></i> View
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm">
-                                <i class="bi bi-trash"></i> Delete
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                @for (product of products; track product.id; let i = $index) {
+                    <tr>
+                        <th scope="row">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</th>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.category_id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.description }}</td>
+                        <td>{{ product.created_at }}</td>
+                        <td>{{ product.updated_at }}</td>
+                        <td>
+                            <img [src]="product.url" (click)="onProductClick(product.id)"
+                                alt="Product Image" class="product-image">
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                
             </tbody>
         </table>
     </div>
@@ -60,11 +63,13 @@
                 <li class="page-item" *ngIf="currentPage > 1">
                     <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
                 </li>
-                <ng-container *ngFor="let page of visiblePages">
-                    <li class="page-item" [ngClass]="{'active': page === currentPage}">
-                        <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
-                    </li>
-                </ng-container>
+                @for (page of visiblePages; track page) {
+                    <ng-container>
+                        <li class="page-item" [ngClass]="{'active': page === currentPage}">
+                            <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+                        </li>
+                    </ng-container>
+                }
                 <li class="page-item" *ngIf="currentPage < totalPages">
                     <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
                 </li>

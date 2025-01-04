@@ -71,7 +71,7 @@
             <p
               class="text-danger"
               *ngIf="
-                registerForm.controls['retypePassword']?.hasError(
+                registerForm.form.controls['retypePassword']?.hasError(
                   'paswordMismatch'
                 ) && registerForm.form.touched
               "
@@ -107,7 +107,7 @@
             <p
               class="text-danger"
               *ngIf="
-                registerForm.controls['dateOfBirth']?.hasError('invalidAge') &&
+                registerForm.form.controls['dateOfBirth']?.hasError('invalidAge') &&
                 registerForm.form.touched
               "
             >

@@ -59,9 +59,12 @@
               name="selectedRole"
             >
               <option selected disabled>Quyền đăng nhập</option>
-              <option *ngFor="let role of roles" [ngValue]="role">
-                {{ role.name }}
-              </option>
+              @for (role of roles; track role.id) {
+                <option [ngValue]="role">
+                  {{ role.name }}
+                </option>
+              }
+              
             </select>
           </div>
           <button type="button" class="login-button" (click)="login()">

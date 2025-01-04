@@ -5,6 +5,7 @@ import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.dtos.UpdateUserDTO;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
+import com.project.shopapp.exceptions.InvalidPasswordException;
 import com.project.shopapp.exceptions.PermissionDenyException;
 import com.project.shopapp.model.Role;
 import com.project.shopapp.model.Token;
@@ -16,6 +17,8 @@ import com.project.shopapp.services.UserService;
 import com.project.shopapp.ultils.MessageKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -93,10 +97,10 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        Optional<Role> optionalRole = roleRepository.findById(roleId);
-        if (optionalRole.isEmpty() || !roleId.equals(existingUser.getRole().getId())) {
-            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.ROLE_NOT_FOUND));
-        }
+//        Optional<Role> optionalRole = roleRepository.findById(roleId);
+//        if (optionalRole.isEmpty() || !roleId.equals(existingUser.getRole().getId())) {
+//            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.ROLE_NOT_FOUND));
+//        }
 
         if (!optionalUser.get().getIsActive()) {
             throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.USER_IS_LOCKED));
@@ -178,6 +182,36 @@ public class UserServiceImpl implements UserService {
     public User getUserDetailsFromRefreshToken(String refreshToken) throws Exception {
         Token existingToken = tokenRepository.findByRefreshToken(refreshToken);
         return getUserDetailsFromToken(existingToken.getToken());
+    }
+
+    @Override
+    public Page<User> findAllUser(String keyword, Pageable pageable) throws Exception {
+        return userRepository.findAllUser(keyword, pageable);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(Long userId, String newPassword) throws InvalidPasswordException, DataNotFoundException {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found."));
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        existingUser.setPassword(encodedPassword);
+        userRepository.save(existingUser);
+        //Reset password => clear token
+        List<Token> tokens = tokenRepository.findByUser(existingUser);
+        for (Token token : tokens) {
+            tokenRepository.delete(token);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void blockOrEnable(Long userId, Boolean active) throws DataNotFoundException {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found."));
+
+        existingUser.setIsActive(active);
+        userRepository.save(existingUser);
     }
 
 }

@@ -4,9 +4,7 @@ import com.project.shopapp.exceptions.InvalidParamException;
 import com.project.shopapp.model.Token;
 import com.project.shopapp.model.User;
 import com.project.shopapp.repositories.TokenRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
@@ -88,13 +86,19 @@ public class JwtTokenUtils {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        String phoneNumber = extractPhoneNumber(token);
-        Token existingToken = tokenRepository.findByToken(token);
-        if (existingToken == null || existingToken.getExpired()) {
-            return false;
+    public boolean validateToken(String token, User user) {
+        try {
+            String phoneNumber = extractPhoneNumber(token);
+            Token existingToken = tokenRepository.findByToken(token);
+            if (existingToken == null || existingToken.getExpired() || !user.getIsActive()) {
+                return false;
+            }
+            return (phoneNumber.equals(user.getUsername()))
+                    && !isTokenExpired(token);
+        } catch (MalformedJwtException e) {
+            throw new IllegalArgumentException("Token không hợp lệ: " + e.getMessage());
+        } catch (ExpiredJwtException e) {
+            throw new IllegalStateException("Token đã hết hạn: " + e.getMessage());
         }
-        return (phoneNumber.equals(userDetails.getUsername()))
-                && !isTokenExpired(token);
     }
 }

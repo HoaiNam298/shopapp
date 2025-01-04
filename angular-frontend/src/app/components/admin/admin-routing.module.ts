@@ -6,6 +6,7 @@ import { ProductAdminComponent } from './product/product.admin.component';
 import { CategoryAdminComponent } from './category/category.admin.component';
 import { DetailOrderAdminComponent } from './detail-order/detail-order.admin.component';
 import { AdminGuard } from '../../guards/admin.guard';
+import { CategoryDetailComponent } from './category-detail/category-detail.component';
 
 export const adminRoutes: Routes = [
   { path: 'admin', 
