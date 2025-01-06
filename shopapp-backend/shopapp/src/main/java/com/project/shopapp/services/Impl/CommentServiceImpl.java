@@ -8,6 +8,7 @@ import com.project.shopapp.model.User;
 import com.project.shopapp.repositories.CommentRepository;
 import com.project.shopapp.repositories.ProductRepository;
 import com.project.shopapp.repositories.UserRepository;
+import com.project.shopapp.response.CommentResponse;
 import com.project.shopapp.services.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -58,12 +60,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentsByUserAndProduct(Long userId, Long productId) {
-        return commentRepository.findByUserIdAndProductId(userId, productId);
+    public List<CommentResponse> getCommentsByUserAndProduct(Long userId, Long productId) {
+        List<Comment> comments = commentRepository.findByUserIdAndProductId(userId, productId);
+        return comments.stream()
+                .map(CommentResponse::fromComment)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Comment> getCommentsProduct(Long productId) {
-        return commentRepository.findByProductId(productId);
+    public List<CommentResponse> getCommentsByProduct(Long productId) {
+        List<Comment> comments = commentRepository.findByProductId(productId);
+        return comments.stream()
+                .map(CommentResponse::fromComment)
+                .collect(Collectors.toList());
     }
 }

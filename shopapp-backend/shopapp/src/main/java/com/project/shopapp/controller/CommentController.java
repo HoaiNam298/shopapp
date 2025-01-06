@@ -5,6 +5,7 @@ import com.project.shopapp.dtos.CommentDTO;
 import com.project.shopapp.model.Comment;
 import com.project.shopapp.model.User;
 import com.project.shopapp.response.CategoryResponse;
+import com.project.shopapp.response.CommentResponse;
 import com.project.shopapp.services.CommentService;
 import com.project.shopapp.ultils.MessageKeys;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("${api.prefix}/comments")
@@ -28,12 +30,17 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAll(
-            @RequestParam("user_id") long userId,
-            @RequestParam("product_id") long productId
+    public ResponseEntity<?> getAllComments(
+            @RequestParam(value = "user_id", required = false) Long userId,
+            @RequestParam("product_id") Long productId
     ){
-        List<Comment> comments = commentService.getCommentsByUserAndProduct(userId, productId);
-        return ResponseEntity.ok(comments);
+        List<CommentResponse> commentResponses;
+        if (userId == null) {
+            commentResponses = commentService.getCommentsByProduct(productId);
+        } else {
+            commentResponses =commentService.getCommentsByUserAndProduct(userId, productId);
+        }
+        return ResponseEntity.ok(commentResponses);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
@@ -57,11 +64,14 @@ public class CommentController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateComment(
-            @PathVariable Long id,
-            @Valid @RequestBody CommentDTO commentDTO,
-            Authentication authentication
+            @PathVariable("id") Long id,
+            @Valid @RequestBody CommentDTO commentDTO
     ){
         try {
+            User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (!Objects.equals(loginUser.getId(), commentDTO.getUserId())) {
+                return ResponseEntity.badRequest().body("You cannot update comment as another user");
+            }
             commentService.updateComment(id, commentDTO);
             return ResponseEntity.ok("Update comment successfully");
         } catch (Exception e) {
