@@ -157,3 +157,13 @@ CREATE TABLE IF NOT EXISTS coupon_conditions (
 	discount_amount DECIMAL(5, 2) NOT NULL,
 	FOREIGN KEY (coupon_id) REFERENCES coupons(id)
 );
+
+INSERT INTO coupons(id, code) VALUES (1, 'ABC123'),
+INSERT INTO coupons(id, code) VALUES (2, 'ANHNAM20');
+	
+INSERT INTO coupon_conditions (id, coupon_id, attribute, operator, value, discount_amount)
+VALUES (1, 1, 'minumum_amount', '>', '100', 10);
+INSERT INTO coupon_conditions (id, coupon_id, attribute, operator, value, discount_amount)
+VALUES (2, 1, 'applicable_date', 'BETWEEN', '2025-01-09', 5);
+INSERT INTO coupon_conditions (id, coupon_id, attribute, operator, value, discount_amount)
+VALUES (3, 2, 'minumum_amount', '>', '200', 20);

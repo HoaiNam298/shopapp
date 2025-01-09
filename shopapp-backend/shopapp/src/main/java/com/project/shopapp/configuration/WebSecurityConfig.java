@@ -58,6 +58,7 @@ public class WebSecurityConfig {
                                 String.format("%s/orders/**", apiPrefix),
                                 String.format("%s/products/images/**", apiPrefix),
                                 String.format("%s/comments**", apiPrefix),
+                                String.format("%s/coupons/calculate**", apiPrefix),
                                 String.format("%s/healthcheck/**", apiPrefix))
                         .permitAll()
 
