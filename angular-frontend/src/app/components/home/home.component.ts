@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
+import { CartService } from '../../service/cart.service';
 
 @Component({
   standalone: true,
@@ -114,4 +115,5 @@ export class HomeComponent implements OnInit {
     debugger
     this.router.navigate(['/products', productId]);
   }
+
 }

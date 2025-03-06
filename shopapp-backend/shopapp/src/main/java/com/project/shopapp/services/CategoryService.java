@@ -10,7 +10,7 @@ public interface CategoryService {
     Category getCategoryById(long id);
     List<Category> getAllCategory();
     Category updateCategory(CategoryDTO categoryDTO, long productId);
-    void deleteCategory(long id);
+    Category deleteCategory(long id) throws Exception;
 
 
 

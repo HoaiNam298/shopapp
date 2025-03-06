@@ -100,17 +100,33 @@ export class LoginComponent implements OnInit {
                 ...response
               }
               this.userService.saveUserResponseToLocalStorage(this.userResponse);
-              if(this.userResponse?.role.name == 'admin') {
-                this.router.navigate(['/admin']);
-              } else if (this.userResponse?.role.name == 'user') {
-                this.router.navigate(['/']);
-              }
+              // Kiểm tra role và điều hướng trang phù hợp
+            const userRole = this.userResponse?.role?.name;
+            const requestedRole = this.selectedRole?.name;
+
+            if (userRole === 'admin' && requestedRole === 'admin') {
+              this.router.navigate(['/admin']);
+            } else if (userRole === 'user' && requestedRole === 'user') {
+              this.router.navigate(['/']);
+            } else {
+              // Nếu đăng nhập với vai trò không hợp lệ
               Swal.fire({
-                title: 'Đăng nhập thành công!',
-                text: 'Chào mừng bạn trở lại!',
-                icon: 'success',
+                title: 'Đăng nhập thất bại!',
+                text: 'Bạn không thể đăng nhập với vai trò này.',
+                icon: 'error',
                 confirmButtonText: 'OK',
               });
+              this.tokenService.removeToken(); // Xóa token để tránh lỗi bảo mật
+              return;
+            }
+
+            // Hiển thị thông báo đăng nhập thành công
+            Swal.fire({
+              title: 'Đăng nhập thành công!',
+              text: 'Chào mừng bạn trở lại!',
+              icon: 'success',
+              confirmButtonText: 'OK',
+            });
               
             },
             complete: () => {

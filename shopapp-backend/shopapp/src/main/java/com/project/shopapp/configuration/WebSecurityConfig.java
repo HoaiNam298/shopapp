@@ -89,7 +89,7 @@ public class WebSecurityConfig {
                         //Order
 
                         .requestMatchers(HttpMethod.POST,
-                                String.format("%s/orders/**", apiPrefix)).hasRole(Role.USER)
+                                String.format("%s/orders/**", apiPrefix)).hasAnyRole(Role.USER, Role.ADMIN)
 
                         .requestMatchers(HttpMethod.PUT,
                                 String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)

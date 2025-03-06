@@ -193,15 +193,53 @@ export class OrderComponent implements OnInit {
       0
     );
   }
-  
+
   confirmDelete(index: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      this.cartItems.splice(index, 1);
-      this.updateCartFromCartItems();
-      this.calculateTotal();
-      debugger
-    }
+    Swal.fire({
+      title: 'Xác nhận xóa',
+      text: 'Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Có, xóa ngay!',
+      cancelButtonText: 'Hủy',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          debugger
+          this.cartItems.splice(index, 1); // Xóa sản phẩm khỏi giỏ hàng
+          this.updateCartFromCartItems(); // Cập nhật dữ liệu giỏ hàng
+          this.calculateTotal(); // Tính toán lại tổng giá trị giỏ hàng
+  
+          // Hiển thị thông báo thành công
+          Swal.fire({
+            title: 'Đã xóa!',
+            text: 'Sản phẩm đã được xóa khỏi giỏ hàng.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+          });
+        } catch (error) {
+          console.error('Lỗi khi xóa sản phẩm:', error);
+          Swal.fire({
+            title: 'Lỗi!',
+            text: 'Không thể xóa sản phẩm. Vui lòng thử lại.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+      }
+    });
   }
+  
+  // confirmDelete(index: number): void {
+  //   if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+  //     this.cartItems.splice(index, 1);
+  //     this.updateCartFromCartItems();
+  //     this.calculateTotal();
+      
+  //   }
+  // }
 
   applyCoupon(): void {
 

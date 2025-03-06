@@ -1,5 +1,6 @@
 package com.project.shopapp.repositories;
 
+import com.project.shopapp.model.Category;
 import com.project.shopapp.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT o FROM Product o WHERE o.id IN :productIds")
     List<Product> findProductsByIds(@Param("productIds") List<Long> productIds);
+
+    List<Product> findByCategory(Category category);
 }

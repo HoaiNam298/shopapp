@@ -13,7 +13,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { OrderAdminComponent } from './components/admin/order/order.admin.component';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent, canActivate: [AuthGuardFn]},
+  { path: '', component: HomeComponent},
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'products/:id', component: DetailProductComponent },
