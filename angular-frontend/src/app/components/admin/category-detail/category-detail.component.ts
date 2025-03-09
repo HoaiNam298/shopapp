@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CategoryService } from '../../../service/category.service';
 import { Router } from 'express';
 import { Category } from '../../../models/category';
-import { enviroment } from '../../../enviroments/enviroment';
+import { enviroment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-category-detail',

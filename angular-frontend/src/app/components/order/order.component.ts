@@ -8,7 +8,7 @@ import { CartService } from '../../service/cart.service';
 import { ProductService } from '../../service/product.service';
 import { OrderService } from '../../service/order.service';
 import { TokenService } from '../../service/token.service';
-import { enviroment } from '../../enviroments/enviroment';
+import { enviroment } from '../../environments/environment';
 import { Order } from '../../models/order';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

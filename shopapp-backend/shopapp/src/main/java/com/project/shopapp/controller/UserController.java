@@ -8,14 +8,12 @@ import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.InvalidPasswordException;
 import com.project.shopapp.model.Token;
 import com.project.shopapp.model.User;
-import com.project.shopapp.response.LoginResponse;
-import com.project.shopapp.response.RegisterResponse;
-import com.project.shopapp.response.UserListResponse;
-import com.project.shopapp.response.UserResponse;
+import com.project.shopapp.response.*;
 import com.project.shopapp.services.TokenService;
 import com.project.shopapp.services.UserService;
 import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.ultils.MessageKeys;
+import com.project.shopapp.ultils.ValidationUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -74,7 +72,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(
+    public ResponseEntity<?> register(
             @Valid @RequestBody UserDTO userDTO,
             BindingResult result
             ) {
@@ -84,17 +82,46 @@ public class UserController {
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(RegisterResponse.builder().build());
+                return ResponseEntity.badRequest().body(
+                        ResponseObject.builder()
+                                .status(HttpStatus.BAD_REQUEST)
+                                .data(null)
+                                .message(errorMessage.toString())
+                                .build());
+            }
+            if (userDTO.getEmail() == null || userDTO.getEmail().trim().isBlank()) {
+                if (userDTO.getPhoneNumber() == null || userDTO.getPhoneNumber().isBlank()) {
+                    return ResponseEntity.badRequest().body(
+                            ResponseObject.builder()
+                                    .status(HttpStatus.BAD_REQUEST)
+                                    .data(null)
+                                    .message("At least email or phone number is required!")
+                                    .build());
+                } else {
+                    if (!ValidationUtils.isValidPhoneNumber(userDTO.getPhoneNumber())) {
+                        throw  new Exception("Invalid phone number");
+                    }
+                }
+            } else {
+                if (!ValidationUtils.isValidEmail(userDTO.getEmail())) {
+                    throw new Exception("Invalid email format");
+                }
             }
             if (!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
-                return ResponseEntity.badRequest().body(RegisterResponse.builder()
-                        .message(localizationUtils.getLocalizedMessage(MessageKeys.PASSWORD_NOT_MATCH))
-                        .build());
+                return ResponseEntity.badRequest().body(
+                        ResponseObject.builder()
+                                .status(HttpStatus.BAD_REQUEST)
+                                .data(null)
+                                .message(localizationUtils.getLocalizedMessage(MessageKeys.PASSWORD_NOT_MATCH))
+                                .build());
             }
             User user = userService.createUser(userDTO);
-            return ResponseEntity.ok(RegisterResponse.builder()
-                    .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_SUCCESSFULLY))
-                    .build());
+            return ResponseEntity.ok(
+                    ResponseObject.builder()
+                            .status(HttpStatus.CREATED)
+                            .data(UserResponse.fromUser(user))
+                            .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_SUCCESSFULLY))
+                            .build());
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(RegisterResponse.builder()
                     .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_FAILED, e.getMessage()))
@@ -107,30 +134,32 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody UserLoginDTO userLoginDTO,
             HttpServletRequest request
             ){
         // Kiểm tra thông tin đăng nhập và sinh token
         try {
-            String token = userService.login(
-                    userLoginDTO.getPhoneNumber(),
-                    userLoginDTO.getPassword(),
-                    userLoginDTO.getRoleId() == null ? 1 : userLoginDTO.getRoleId());
+            String token = userService.login(userLoginDTO);
 
             String userAgent = request.getHeader("User-Agent");
             User user = userService.getUserDetailsFromToken(token);
             Token jwtToken = tokenService.addToken(user, token, isMobileDevice(userAgent));
 
-            return ResponseEntity.ok(LoginResponse.builder()
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
+                    .token(jwtToken.getToken())
+                    .tokenType(jwtToken.getTokenType())
+                    .refreshToken(jwtToken.getRefreshToken())
+                    .username(user.getUsername())
+                    .roles(user.getAuthorities().stream().map(item -> item.getAuthority()).toList())
+                    .id(user.getId())
+                    .build();
+
+            return ResponseEntity.ok(ResponseObject.builder()
                             .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
-                            .id(user.getId())
-                            .token(jwtToken.getToken())
-                            .tokenType(jwtToken.getTokenType())
-                            .refreshToken(jwtToken.getRefreshToken())
-                            .username(user.getPhoneNumber())
-                            .roles(user.getAuthorities().stream()
-                                    .map(item -> item.getAuthority()).toList())
+                            .data(loginResponse)
+                            .status(HttpStatus.OK)
                             .build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(LoginResponse.builder()

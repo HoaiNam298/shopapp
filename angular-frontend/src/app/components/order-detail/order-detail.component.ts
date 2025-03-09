@@ -7,7 +7,7 @@ import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import { Product } from '../../models/product';
 import { OrderService } from '../../service/order.service';
-import { enviroment } from '../../enviroments/enviroment';
+import { enviroment } from '../../environments/environment';
 
 @Component({
   standalone: true,

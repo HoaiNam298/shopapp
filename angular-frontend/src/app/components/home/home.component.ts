@@ -4,7 +4,7 @@ import { Product } from '../../models/product';
 import { Category } from '../../models/category';
 import { ProductService } from '../../service/product.service';
 import { CategoryService } from '../../service/category.service';
-import { enviroment } from '../../enviroments/enviroment';
+import { enviroment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';

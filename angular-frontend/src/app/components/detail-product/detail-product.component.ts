@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../service/product.service';
 import { CartService } from '../../service/cart.service';
 import { Product } from '../../models/product';
 import { ProductImage } from '../../models/product.image';
-import { enviroment } from '../../enviroments/enviroment';
+import { enviroment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
@@ -33,7 +33,8 @@ export class DetailProductComponent implements OnInit{
     private productService: ProductService,
     private cartService: CartService,
     private router: Router,
-    private activatedRouter: ActivatedRoute
+    private activatedRouter: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -45,27 +46,8 @@ export class DetailProductComponent implements OnInit{
       }
 
       // Nếu productId hợp lệ, gọi API lấy chi tiết sản phẩm
-      if (!isNaN(this.productId)) {
-        this.productService.getDetailProduct(this.productId).subscribe({
-          next: (response: any) => {
-            // Lấy danh sách ảnh sản phẩm và thay đổi URL
-            if (response.product_images && response.product_images.length > 0) {
-              response.product_images.forEach((product_image: ProductImage) => {
-                product_image.image_url = `${enviroment.apiBaseUrl}/products/images/${product_image.image_url}`;
-              });
-            }
-            this.product = response;
-
-            // Hiển thị ảnh đầu tiên
-            this.showImage(0);
-          },
-          complete: () => {
-            console.log('Product details loaded successfully.');
-          },
-          error: (error: any) => {
-            console.error('Error fetching detail:', error);
-          }
-        });
+      if (!isNaN(this.productId) && this.productId > 0) {
+        this.loadProductDetails(this.productId);
       } else {
         console.error('Invalid productId:', idParam);
         this.router.navigate(['/not-found']);
@@ -73,24 +55,56 @@ export class DetailProductComponent implements OnInit{
     });
   }
 
+  private loadProductDetails(productId: number) {
+    this.productService.getDetailProduct(productId).subscribe({
+      next: (response: any) => {
+        if (response) {
+          this.product = response;
+
+          // Cập nhật URL ảnh sản phẩm
+          if (this.product?.product_images?.length) {
+
+            this.product.product_images = this.product.product_images.map((product_image) => ({
+              ...product_image,
+              image_url: `${enviroment.apiBaseUrl}/products/images/${product_image.image_url}`
+            }));
+
+            // Chỉ gọi showImage(0) sau khi đảm bảo product_images đã cập nhật
+            this.showImage(0);
+          } else {
+            console.warn('Sản phẩm không có ảnh.');
+          }
+
+          // Cập nhật giao diện để tránh lỗi khi load lại trang
+          this.cdr.detectChanges();
+        }
+      },
+      complete: () => {
+        console.log('Product details loaded successfully.');
+      },
+      error: (error: any) => {
+        console.error('Lỗi khi lấy chi tiết sản phẩm:', error);
+        this.router.navigate(['/not-found']);
+      }
+    });
+  }
+
   showImage(index: number) {
-    debugger
-    if(this.product && this.product.product_images && this.product.product_images.length > 0) {
-      //đảm bảo index nằm trong khoảng hợp lệ
-      if(index < 0) {
-        index = 0
+    if (this.product && this.product.product_images && this.product.product_images.length > 0) {
+      // Đảm bảo index nằm trong khoảng hợp lệ
+      if (index < 0) {
+        index = 0;
       } else if (index >= this.product.product_images.length) {
         index = this.product.product_images.length - 1;
       }
-      //Gán index hiện tại và cập nhật ảnh hiển thị
+      // Gán index hiện tại và cập nhật ảnh hiển thị
       this.currentImageIndex = index;
     }
   }
 
   thumbnailClick(index: number) {
-    debugger
-    //Gọi khi mội thumbnail được bấm
-    this.currentImageIndex = index; //Cập nhật currentImageIndex
+    // Gọi khi một thumbnail được bấm
+    this.currentImageIndex = index; // Cập nhật currentImageIndex
   }
 
   nextImage(): void {

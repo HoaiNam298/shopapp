@@ -7,12 +7,13 @@ public class MessageKeys {
     public static final String USER_NOT_FOUND = "user.user_not_found";
     public static final String CANNOT_UPDATE_TO_ADMIN = "user.cannot_update_to_admin";
     public static final String WRONG_PASS_WORD = "user.login.wrong_pass_word";
-    public static final String INVALID_PHONE_NUMBER = "user.login.invalid_phone_number";
+    public static final String INVALID_PHONE_PASS = "user.login.invalid_phone_pass";
 
     public static final String PASSWORD_NOT_MATCH = "user.register.password_not_match";
     public static final String REGISTER_FAILED = "user.register.register_failed";
     public static final String REGISTER_SUCCESSFULLY = "user.register.register_successfully";
     public static final String PHONE_EXISTS = "user.register.phone_exists";
+    public static final String EMAIL_EXISTS = "user.register.email_exists";
     public static final String ROLE_NOT_FOUND = "user.register.role_not_found";
     public static final String CANNOT_REGISTER_ADMIN = "user.register.cannot_register_admin";
 

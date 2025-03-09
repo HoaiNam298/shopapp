@@ -4,6 +4,7 @@ import com.project.shopapp.components.JwtTokenUtils;
 import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.dtos.UpdateUserDTO;
 import com.project.shopapp.dtos.UserDTO;
+import com.project.shopapp.dtos.UserLoginDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.InvalidPasswordException;
 import com.project.shopapp.exceptions.PermissionDenyException;
@@ -51,8 +52,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+        String email = userDTO.getEmail();
+        // Nếu phoneNumber không null thì mới kiểm tra tồn tại
+        if (phoneNumber != null && userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new DataIntegrityViolationException(localizationUtils.getLocalizedMessage(MessageKeys.PHONE_EXISTS));
+        }
+
+        // Nếu email không null thì mới kiểm tra tồn tại
+        if (email != null && userRepository.existsByEmail(email)) {
+            throw new DataIntegrityViolationException(localizationUtils.getLocalizedMessage(MessageKeys.EMAIL_EXISTS));
         }
         Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.ROLE_NOT_FOUND)));
@@ -64,6 +72,7 @@ public class UserServiceImpl implements UserService {
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
                 .phoneNumber(userDTO.getPhoneNumber())
+                .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
                 .address(userDTO.getAddress())
                 .dateOfBirth(userDTO.getDateOfBirth())
@@ -83,16 +92,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password, Long roleId) throws Exception {
-        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
-        if (optionalUser.isEmpty()) {
-            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.INVALID_PHONE_NUMBER));
+    public String login(UserLoginDTO userLoginDTO) throws Exception {
+        Optional<User> optionalUser = Optional.empty();
+        String subject = null;
+        //Check if the user exists by phone number
+        if (userLoginDTO.getPhoneNumber() !=null && !userLoginDTO.getPhoneNumber().isBlank()) {
+            optionalUser = userRepository.findByPhoneNumber(userLoginDTO.getPhoneNumber());
+            subject = userLoginDTO.getPhoneNumber();
         }
+        //Check if the user is not found by phone number, check by email
+        if (userLoginDTO.getEmail() !=null && optionalUser.isEmpty()) {
+            optionalUser = userRepository.findByEmail(userLoginDTO.getEmail());
+            subject = userLoginDTO.getEmail();
+        }
+
+        //If the user is not found, throw an exception
+        if (optionalUser.isEmpty()) {
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.INVALID_PHONE_PASS));
+        }
+
+        //Get the existing user
         User existingUser = optionalUser.get();
+
         //check password
         if (existingUser.getFacebookAccountId() == 0
                 && existingUser.getGoogleAccountId() ==0) {
-            if (!passwordEncoder.matches(password, existingUser.getPassword())) {
+            if (!passwordEncoder.matches(userLoginDTO.getPassword(), existingUser.getPassword())) {
                 throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PASS_WORD));
             }
         }
@@ -107,7 +132,7 @@ public class UserServiceImpl implements UserService {
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                phoneNumber, password,
+                subject, userLoginDTO.getPassword(),
                 existingUser.getAuthorities()
         );
         //authenticate with Java Spring security

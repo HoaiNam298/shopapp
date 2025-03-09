@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Product } from '../../../models/product';
 import { ProductService } from '../../../service/product.service';
-import { enviroment } from '../../../enviroments/enviroment';
+import { enviroment } from '../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

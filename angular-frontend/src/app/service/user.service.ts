@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { registerDto } from '../dtos/user/register.dto';
 import { LoginDto } from '../dtos/user/login.dto';
-import { enviroment } from '../enviroments/enviroment';
+import { enviroment } from '../environments/environment';
 import { UserResponse } from '../responses/user/user.response';
 import { UpdateUserDTO } from '../dtos/user/update.user.dto';
 import { DOCUMENT } from '@angular/common';

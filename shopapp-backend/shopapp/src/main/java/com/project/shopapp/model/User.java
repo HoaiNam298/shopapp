@@ -1,6 +1,7 @@
 package com.project.shopapp.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +37,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "address", length = 200)
     private String address;
 
+    @Column(name = "email", length = 200)
+    private String email;
+
     @Column(name = "password", nullable = false, length = 200)
     private String password;
 
@@ -69,7 +73,8 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return phoneNumber;
+//        return phoneNumber;
+        return fullName;
     }
 
     @Override

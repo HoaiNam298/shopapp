@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderResponse } from '../../../responses/order.response';
 import { OrderService } from '../../../service/order.service';
-import { enviroment } from '../../../enviroments/enviroment';
+import { enviroment } from '../../../environments/environment';
 import { OrderDTO } from '../../../dtos/order.dto';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
