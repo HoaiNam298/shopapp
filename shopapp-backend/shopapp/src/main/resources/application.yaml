@@ -27,6 +27,31 @@ spring:
     default-locale: en
   jackson:
     property-naming-strategy: SNAKE_CASE
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            #google cloud console
+
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "${GOOGLE_REDIRECT_URL:http://localhost:4200/auth/google/callback}"
+            user-info-uri: http://www.googleapis.com/oauth2/v3/userinfo
+            resource-server:
+              opaque-token:
+                introspection-uri: "http://www.googleapis.com"
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID}
+            client-secret: ${FACEBOOK_CLIENT_SECRET}
+            redirect-uri: "${FACEBOOK_REDIRECT_URL:http://localhost:4200/auth/facebook/callback}"
+            auth-uri: http://www.facebook.com/v22.0/v3/dialog/oauth
+            token-uri: http://www.graph.facebook.com/oauth/access_token
+            user-info-uri: http://www.graph.facebook.com/me?fields=id,name,email,picture.type(large)
+            scope:
+              - email
+              - public_profile
+
 
 api:
   prefix: api/v1

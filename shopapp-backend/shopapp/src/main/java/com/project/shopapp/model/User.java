@@ -50,10 +50,10 @@ public class User extends BaseEntity implements UserDetails {
     private LocalDate dateOfBirth;
 
     @Column(name = "facebook_account_id")
-    private int facebookAccountId;
+    private String facebookAccountId;
 
     @Column(name = "google_account_id")
-    private int googleAccountId;
+    private String googleAccountId;
 
     @ManyToOne
     @JoinColumn(name = "role_id ")

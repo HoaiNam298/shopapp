@@ -25,7 +25,7 @@ public class LoginResponse {
     private String token;
 
     @JsonProperty("token_type")
-    private String tokenType;
+    private String tokenType = "Bearer";
 
     @JsonProperty("refresh_token")
     private String refreshToken;

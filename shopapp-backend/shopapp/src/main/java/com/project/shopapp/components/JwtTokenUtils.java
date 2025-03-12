@@ -34,12 +34,20 @@ public class JwtTokenUtils {
         //properties => claims
         Map<String, Object> claims = new HashMap<>();
 //        this.generateSecretKey();
-        claims.put("phoneNumber", user.getPhoneNumber());
         claims.put("userId", user.getId());
+
+        // Nếu có số điện thoại thì dùng, nếu không thì dùng email
+        String subject = (user.getPhoneNumber() != null && !user.getPhoneNumber().isEmpty())
+                ? user.getPhoneNumber()
+                : user.getEmail();
+
+        // Lưu cả phoneNumber và email vào claims
+        claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("email", user.getEmail());
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
-                    .setSubject(user.getPhoneNumber())
+                    .setSubject(subject)
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignKey(), SignatureAlgorithm.HS256)
                     .compact();
@@ -51,16 +59,17 @@ public class JwtTokenUtils {
 
     private Key getSignKey() {
         byte[] bytes = Decoders.BASE64.decode(secretKey);
-        //Keys.hmacShaKeyFor(Decoders.BASE64.decode("2bBXzdplW1CbCQqvzmHApdmM91XrxbrJqtgUfQJSEWk="))
         return Keys.hmacShaKeyFor(bytes);
     }
 
+    /**
+     * Tạo secret key ngẫu nhiên (chỉ dùng khi cần tạo mới key)
+     */
     private String generateSecretKey() {
         SecureRandom random = new SecureRandom();
         byte[] keyBytes = new byte[32];
         random.nextBytes(keyBytes);
-        String secretKey = Encoders.BASE64.encode(keyBytes);
-        return secretKey;
+        return Encoders.BASE64.encode(keyBytes);
     }
 
     private Claims extractAllClaims(String token) {
@@ -82,18 +91,25 @@ public class JwtTokenUtils {
         return expirationDate.before(new Date());
     }
 
-    public String extractPhoneNumber(String token) {
+    /**
+     * Lấy số điện thoại từ token (hoặc email nếu không có số điện thoại)
+     */
+    public String extractSubject(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     public boolean validateToken(String token, User user) {
         try {
-            String phoneNumber = extractPhoneNumber(token);
+            String tokenSubject = extractSubject(token);
+            String phoneNumber = extractClaim(token, claims -> claims.get("phoneNumber", String.class));
+            String email = extractClaim(token, claims -> claims.get("email", String.class));
             Token existingToken = tokenRepository.findByToken(token);
             if (existingToken == null || existingToken.getExpired() || !user.getIsActive()) {
                 return false;
             }
-            return (phoneNumber.equals(user.getUsername()))
+            // Kiểm tra token hợp lệ bằng cách so sánh với user
+            return ((phoneNumber != null && phoneNumber.equals(user.getPhoneNumber()))
+                    || (email != null && email.equals(user.getEmail())))
                     && !isTokenExpired(token);
         } catch (MalformedJwtException e) {
             throw new IllegalArgumentException("Token không hợp lệ: " + e.getMessage());

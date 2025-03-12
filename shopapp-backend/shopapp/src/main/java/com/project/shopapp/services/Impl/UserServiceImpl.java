@@ -27,7 +27,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -78,12 +80,12 @@ public class UserServiceImpl implements UserService {
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
+                .isActive(true)
                 .build();
 
         newUser.setRole(role);
-        newUser.setIsActive(true);
         //Kiểm tra nếu có accountId, không yêu cầu password
-        if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() ==0) {
+        if (userDTO.getFacebookAccountId() == null && userDTO.getGoogleAccountId() == null) {
             String password = userDTO.getPassword();
             String encodedPassword = passwordEncoder.encode(password);
             newUser.setPassword(encodedPassword);
@@ -95,6 +97,33 @@ public class UserServiceImpl implements UserService {
     public String login(UserLoginDTO userLoginDTO) throws Exception {
         Optional<User> optionalUser = Optional.empty();
         String subject = null;
+        if (roleRepository.findByName(Role.USER) == null) {
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.ROLE_NOT_FOUND));
+        }
+
+        if (userLoginDTO.getGoogleAccountId() != null) {
+            optionalUser = userRepository.findByGoogleAccountId(userLoginDTO.getGoogleAccountId());
+            subject = "Google:" + userLoginDTO.getGoogleAccountId();
+            //Nếu không tìm thấy người dùng tạo bản ghi mới
+            if (optionalUser.isEmpty()) {
+                User newUser = User.builder()
+                        .fullName(userLoginDTO.getFullName() != null ? userLoginDTO.getFullName() : "")
+                        .email(userLoginDTO.getEmail() != null ? userLoginDTO.getEmail() : "")
+                        .role(roleRepository.findByName(Role.USER))
+                        .googleAccountId(userLoginDTO.getGoogleAccountId())
+                        .password("")
+                        .isActive(true)
+                        .build();
+                newUser = userRepository.save(newUser);
+                //Optional trở thành có giá trị với người dùng mới
+                optionalUser = Optional.of(newUser);
+            }
+
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("email", userLoginDTO.getEmail());
+            return jwtTokenUtil.generationToken(optionalUser.get());
+        }
+
         //Check if the user exists by phone number
         if (userLoginDTO.getPhoneNumber() !=null && !userLoginDTO.getPhoneNumber().isBlank()) {
             optionalUser = userRepository.findByPhoneNumber(userLoginDTO.getPhoneNumber());
@@ -115,8 +144,8 @@ public class UserServiceImpl implements UserService {
         User existingUser = optionalUser.get();
 
         //check password
-        if (existingUser.getFacebookAccountId() == 0
-                && existingUser.getGoogleAccountId() ==0) {
+        if (existingUser.getFacebookAccountId() == null
+                && existingUser.getGoogleAccountId() == null) {
             if (!passwordEncoder.matches(userLoginDTO.getPassword(), existingUser.getPassword())) {
                 throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PASS_WORD));
             }
@@ -142,11 +171,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserDetailsFromToken(String token) throws Exception {
-        if (jwtTokenUtil.isTokenExpired(token)){
+        if (jwtTokenUtil.isTokenExpired(token)) {
             throw new Exception("Token is expired");
         }
-        String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
-        Optional<User> user = userRepository.findByPhoneNumber(phoneNumber);
+
+        // Lấy subject từ token (số điện thoại hoặc email)
+        String subject = jwtTokenUtil.extractSubject(token);
+
+        // Lấy email từ claims nếu có
+        String email = jwtTokenUtil.extractSubject(token);
+
+        // Kiểm tra xem subject là số điện thoại hay email
+        Optional<User> user = userRepository.findByPhoneNumber(subject);
+        if (user.isEmpty()) {
+            user = userRepository.findByEmail(email); // Nếu không tìm thấy bằng phone, thử tìm bằng email
+        }
 
         if (user.isPresent()) {
             return user.get();
@@ -154,6 +193,7 @@ public class UserServiceImpl implements UserService {
             throw new Exception("User not found");
         }
     }
+
 
     @Override
     @Transactional
@@ -182,17 +222,17 @@ public class UserServiceImpl implements UserService {
                 updatedUserDTO.getDateOfBirth() != null ? updatedUserDTO.getDateOfBirth() : existingUser.getDateOfBirth()
         );
         existingUser.setFacebookAccountId(
-                updatedUserDTO.getFacebookAccountId() > 0 ? updatedUserDTO.getFacebookAccountId() : existingUser.getFacebookAccountId()
+                updatedUserDTO.getFacebookAccountId() != null ? updatedUserDTO.getFacebookAccountId() : existingUser.getFacebookAccountId()
         );
         existingUser.setGoogleAccountId(
-                updatedUserDTO.getGoogleAccountId() > 0 ? updatedUserDTO.getGoogleAccountId() : existingUser.getGoogleAccountId()
+                updatedUserDTO.getGoogleAccountId() != null ? updatedUserDTO.getGoogleAccountId() : existingUser.getGoogleAccountId()
         );
 //        existingUser.setRole(role);
         // Nếu tài khoản liên kết Facebook/Google không tồn tại và có thay đổi mật khẩu
         if (updatedUserDTO.getPassword() != null
                 && !updatedUserDTO.getPassword().isEmpty()
-                && updatedUserDTO.getFacebookAccountId() == 0
-                && updatedUserDTO.getGoogleAccountId() == 0) {
+                && updatedUserDTO.getFacebookAccountId() == null
+                && updatedUserDTO.getGoogleAccountId() == null) {
             if (!updatedUserDTO.getPassword().equals(updatedUserDTO.getRetypePassword())) {
                 throw new DataNotFoundException("Password and retype password not the same");
             }

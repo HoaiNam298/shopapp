@@ -71,6 +71,20 @@
             Đăng nhập
           </button>
           <div class="divider"></div>
+          <div class="social-login-buttons">
+            <button 
+              type="button"
+              (click)="loginWithGoogle()"
+              class="social-button google-button">
+              Đăng nhập với google
+            </button>
+            <button 
+              type="button"
+              (click)="loginWithFacebook()"
+              class="social-button facebook-button">
+              Đăng nhập với Facebook
+            </button>
+          </div>
           <p class="text-center">
             Bạn chưa đăng ký?
             <span>

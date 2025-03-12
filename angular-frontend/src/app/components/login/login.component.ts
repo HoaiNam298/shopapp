@@ -14,6 +14,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
+import { error } from 'console';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   standalone: true,
@@ -30,15 +33,14 @@ import { FooterComponent } from '../footer/footer.component';
 })
 export class LoginComponent implements OnInit {
   @ViewChild('loginForm') loginForm!: NgForm;
-  /* login user
+  //login user
   phoneNumber: string = '1122334455';
   password: string = '123';
-  */
 
-  // /* login admin
+  /* login admin
   phoneNumber: string = '2233445566';
   password: string = '123';
-  // */
+  */
 
   roles: Role[] = [];
   rememberMe: boolean = true;
@@ -50,7 +52,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private tokenService: TokenService,
     private roleService: RoleService,
-    private cartService: CartService
+    private cartService: CartService,
+    private authService: AuthService
     ) {
   }
 
@@ -72,6 +75,34 @@ export class LoginComponent implements OnInit {
       },
     })
   }
+
+  loginWithGoogle() {
+    debugger
+    this.authService.authenticate('google').subscribe({
+      next: (url: string) => {
+        debugger
+        window.location.href = url
+      },
+      error: (error: HttpErrorResponse) => {
+        debugger
+        console.error('Lỗi khi xác thực với google', error?.error?.message ?? '')
+      }
+    })
+  }
+
+  loginWithFacebook() {
+    debugger
+    this.authService.authenticate('facebook').subscribe({
+      next: (url: string) => {
+        debugger
+        window.location.href = url
+      },
+      error: (error: HttpErrorResponse) => {
+        debugger
+        console.error('Lỗi khi xác thực với Facebook', error?.error?.message ?? '')
+      }
+    })
+  }
   
   login(){
     const message = `phone: ${this.phoneNumber}` +
@@ -89,7 +120,7 @@ export class LoginComponent implements OnInit {
       next: (response: LoginResponse) => {
         //Muốn sử dụng token trong các yêu cầu API
         debugger
-        const {token} = response;
+        const {token} = response.data;
         if(this.rememberMe) {
           this.tokenService.setToken(token);
           debugger;
@@ -116,7 +147,7 @@ export class LoginComponent implements OnInit {
                 icon: 'error',
                 confirmButtonText: 'OK',
               });
-              this.tokenService.removeToken(); // Xóa token để tránh lỗi bảo mật
+              //this.tokenService.removeToken(); // Xóa token để tránh lỗi bảo mật
               return;
             }
 

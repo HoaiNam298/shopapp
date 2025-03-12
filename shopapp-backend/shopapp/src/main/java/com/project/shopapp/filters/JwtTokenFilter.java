@@ -51,7 +51,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
 
             final String token = authHeader.substring(7);
-            final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
+            final String phoneNumber = jwtTokenUtil.extractSubject(token);
             if (phoneNumber != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
                 User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
@@ -84,6 +84,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/comments", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
                 Pair.of(String.format("%s/users/login", apiPrefix), "POST"),
+                Pair.of(String.format("%s/users/auth/social-login", apiPrefix), "GET"),
+                Pair.of(String.format("%s/users/auth/social/callback", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/refresh-token", apiPrefix), "POST")
         );
 

@@ -9,6 +9,7 @@ import com.project.shopapp.exceptions.InvalidPasswordException;
 import com.project.shopapp.model.Token;
 import com.project.shopapp.model.User;
 import com.project.shopapp.response.*;
+import com.project.shopapp.services.AuthService;
 import com.project.shopapp.services.TokenService;
 import com.project.shopapp.services.UserService;
 import com.project.shopapp.components.LocalizationUtils;
@@ -28,9 +29,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,6 +40,7 @@ public class UserController {
     private final UserService userService;
     private final LocalizationUtils localizationUtils;
     private final TokenService tokenService;
+    private final AuthService authService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("")
@@ -137,7 +137,7 @@ public class UserController {
     public ResponseEntity<?> login(
             @Valid @RequestBody UserLoginDTO userLoginDTO,
             HttpServletRequest request
-            ){
+            ) throws Exception{
         // Kiểm tra thông tin đăng nhập và sinh token
         try {
             String token = userService.login(userLoginDTO);
@@ -145,6 +145,17 @@ public class UserController {
             String userAgent = request.getHeader("User-Agent");
             User user = userService.getUserDetailsFromToken(token);
             Token jwtToken = tokenService.addToken(user, token, isMobileDevice(userAgent));
+
+//            return ResponseEntity.ok(LoginResponse.builder()
+//                            .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
+//                            .id(user.getId())
+//                            .token(jwtToken.getToken())
+//                            .tokenType(jwtToken.getTokenType())
+//                            .refreshToken(jwtToken.getRefreshToken())
+//                            .username(user.getPhoneNumber())
+//                            .roles(user.getAuthorities().stream()
+//                                    .map(item -> item.getAuthority()).toList())
+//                            .build());
 
             LoginResponse loginResponse = LoginResponse.builder()
                     .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
@@ -261,5 +272,80 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
+    }
+
+    //Frontend login google -> trang đăng nhập gg -> có code
+    //code -> google token -> lấy các thông tin khác
+    @GetMapping("/auth/social-login")
+    public ResponseEntity<?> socialAuth(
+            @RequestParam("login_type") String loginType,
+            HttpServletRequest request
+    ) {
+        loginType = loginType.trim().toLowerCase();
+        String url = authService.generateAuthUrl(loginType);
+        return ResponseEntity.ok(url);
+    }
+
+    @GetMapping("/auth/social/callback")
+    public ResponseEntity<?> callback(
+            @RequestParam("code") String code,
+            @RequestParam("login_type") String loginType,
+            HttpServletRequest request
+    ) throws Exception {
+        //Call the AuthService to get user info
+        Map<String, Object> userInfor = authService.authenticateAndFetchProfile(code, loginType);
+
+        if (userInfor == null) {
+            return ResponseEntity.badRequest().body(new ResponseObject(
+                    "Failed to authenticate", HttpStatus.BAD_REQUEST, null
+            ));
+        }
+
+        //Extract user information from userInfo map
+        String accountId = "";
+        String name = "";
+        String picture = "";
+        String email = "";
+
+        if (loginType.trim().equals("google")) {
+            accountId = (String) Objects.requireNonNullElse(userInfor.get("sub"), "");
+            name = (String) Objects.requireNonNullElse(userInfor.get("name"), "");
+            picture = (String) Objects.requireNonNullElse(userInfor.get("picture"), "");
+            email = (String) Objects.requireNonNullElse(userInfor.get("email"), "");
+        } else if (loginType.trim().equals("facebook")) {
+            accountId = (String) Objects.requireNonNullElse(userInfor.get("id"), "");
+            name = (String) Objects.requireNonNullElse(userInfor.get("name"), "");
+            email = (String) Objects.requireNonNullElse(userInfor.get("email"), "");
+            //Lấy URL ảnh từ ctdl của fb
+            Object pictureObj = userInfor.get("picture");
+            if (pictureObj instanceof Map) {
+                Map<?, ?> pictureData = (Map<?, ?>) pictureObj;
+                Object dataObj = pictureData.get("data");
+                if (dataObj instanceof Map) {
+                    Map<?, ?> dataMap = (Map<?, ?>) dataObj;
+                    Object urlObj = dataMap.get("url");
+                    if (urlObj instanceof String) {
+                        picture = (String) urlObj;
+                    }
+                }
+            }
+        }
+
+        //Tạo đối tượng userLoginDTO
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .email(email)
+                .fullName(name)
+                .password("")
+                .phoneNumber("")
+                .build();
+        if (loginType.trim().equals("google")) {
+            userLoginDTO.setGoogleAccountId(accountId);
+//            userLoginDTO.setFacebookAccountId("");
+        } else if (loginType.trim().equals("facebook")) {
+            userLoginDTO.setFacebookAccountId(accountId);
+//            userLoginDTO.setGoogleAccountId("");
+        }
+
+        return this.login(userLoginDTO, request);
     }
 }
